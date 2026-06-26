@@ -30,6 +30,7 @@ import com.jetpackduba.gitnuro.ui.dialogs.base.MaterialDialog
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
+@Suppress("LongMethod")
 @Composable
 fun ErrorDialog(
     error: CompletedTask.Failure,
@@ -161,6 +162,7 @@ fun copyMessageError(clipboard: ClipboardManager, ex: Exception) {
     clipboard.setText(AnnotatedString(ex.stackTraceToString()))
 }
 
+@Suppress("CyclomaticComplexMethod")
 fun TaskType.errorTitle(): String {
     return when (this) {
         TaskType.Unspecified -> "Error"
