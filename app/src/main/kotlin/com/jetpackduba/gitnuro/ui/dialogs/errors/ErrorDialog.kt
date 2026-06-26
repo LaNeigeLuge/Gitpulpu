@@ -45,6 +45,9 @@ fun ErrorDialog(
             ?.stackTraceToString()
             .orEmpty()
     }
+    val friendlyMessage = remember(error) {
+        friendlyErrorMessage(error)
+    }
     var showStackTrace by remember { mutableStateOf(false) }
 
     MaterialDialog(
@@ -75,12 +78,28 @@ fun ErrorDialog(
                 )
             }
 
+            if (friendlyMessage != null) {
+                Text(
+                    text = friendlyMessage.first,
+                    color = MaterialTheme.colors.onBackground,
+                    modifier = Modifier.padding(top = 16.dp),
+                    style = MaterialTheme.typography.body2,
+                )
+                Text(
+                    text = friendlyMessage.second,
+                    color = MaterialTheme.colors.primary,
+                    modifier = Modifier.padding(top = 8.dp),
+                    style = MaterialTheme.typography.body2,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
+
             SelectionContainer {
                 Text(
-                    text = error.reason.toString(), // TODO
-                    color = MaterialTheme.colors.onBackground,
+                    text = error.reason.toString(),
+                    color = if (friendlyMessage != null) MaterialTheme.colors.onBackground.copy(alpha = 0.5f) else MaterialTheme.colors.onBackground,
                     modifier = Modifier
-                        .padding(top = 16.dp)
+                        .padding(top = if (friendlyMessage != null) 12.dp else 16.dp)
                         .widthIn(max = 600.dp),
                     style = MaterialTheme.typography.body2,
                 )
@@ -240,5 +259,37 @@ fun TaskType.errorTitle(): String {
         TaskType.RefreshTags -> "Refresh tags failed"
         TaskType.GetWorktree -> "Get worktree failed"
         TaskType.UpdateRemote -> "Update remote failed"
+    }
+}
+
+private fun friendlyErrorMessage(error: CompletedTask.Failure): Pair<String, String>? {
+    val message = (error.reason as? GenericError)?.message ?: return null
+
+    return when {
+        message.contains("Cannot run program") && message.contains("!") ->
+            "Your git credential helper uses a shell command prefix (!) that JGit cannot execute directly." to
+                "Fix: Use SSH authentication instead, or configure a credential helper without the ! prefix in your .gitconfig"
+
+        message.contains("not authorized") || message.contains("401") || message.contains("403") ->
+            "Authentication failed. Your credentials may be expired or missing." to
+                "Fix: Run 'gh auth login' in your terminal or configure an SSH key for this remote."
+
+        message.contains("Could not read from remote") || message.contains("not found") ->
+            "Cannot reach the remote repository. It may not exist or you may not have access." to
+                "Fix: Check the remote URL with 'git remote -v' and verify you have access."
+
+        message.contains("CONFLICT") || message.contains("conflict") ->
+            "There are merge conflicts that need to be resolved manually." to
+                "Fix: Open the conflicting files, resolve the markers (<<<< / ====), then stage and commit."
+
+        message.contains("lock") && message.contains(".git") ->
+            "Another git process may be running, or a previous operation left a lock file." to
+                "Fix: Close other git tools, or delete the .git/*.lock file if no other git process is running."
+
+        message.contains("detached HEAD") ->
+            "You are in detached HEAD state — not on any branch." to
+                "Fix: Create a new branch from the current state with 'git checkout -b branch-name'."
+
+        else -> null
     }
 }

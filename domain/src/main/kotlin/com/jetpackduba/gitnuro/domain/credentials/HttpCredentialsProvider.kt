@@ -294,13 +294,12 @@ data class ExternalCredentialsHelper(
      * treated as arguments instead of part of the binary path
      */
     fun sanitizedCommand(): List<String> {
-        return if (path.endsWith(GH_CLI_ARGS)) {
-            val path = path.removeSuffix(GH_CLI_ARGS).trim()
-            val arguments = GH_CLI_ARGS.split(" ")
+        val cleanPath = if (path.startsWith("!")) path.removePrefix("!") else path
 
-            listOf(path) + arguments
+        return if (cleanPath.contains(" ")) {
+            cleanPath.trim().split(" ")
         } else {
-            listOf(path)
+            listOf(cleanPath)
         }
     }
 }
