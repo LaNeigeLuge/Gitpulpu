@@ -71,10 +71,10 @@ fun StatusPane(
 ) {
     val swapUncommittedChanges = statusState.swapUncommittedChanges
     val (commitMessage, setCommitMessage) = remember() { mutableStateOf("") }
-    val stagedListState = rememberInTab("statusStagedListState", statusState.staged) {
+    val stagedListState = rememberInTab("statusStagedListState") {
         LazyListState()
     }
-    val unstagedListState = rememberInTab("statusUnstagedListState", statusState.unstaged) {
+    val unstagedListState = rememberInTab("statusUnstagedListState") {
         LazyListState()
     }
     val isAmend = statusState.isAmend

@@ -2,6 +2,7 @@
 
 package com.jetpackduba.gitnuro.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.text.font.FontWeight
@@ -85,42 +87,54 @@ fun SidePanel(
                 }
         )
 
-        ScrollableLazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 4.dp)
-        ) {
-            localBranches(
-                branchesState = branchesState,
-                selectedItem = selectedItem,
-                viewModel = viewModel,
-                onChangeDefaultUpstreamBranch = { onNavigate(Screen.BranchChangeUpstream(it)) },
-                onRenameBranch = { onNavigate(Screen.BranchRename(it)) },
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(Res.drawable.ghost),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(180.dp)
+                    .align(Alignment.BottomCenter)
+                    .offset(y = 20.dp),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground.copy(alpha = 0.04f)),
             )
 
-            remotes(
-                remotesState = remotesState,
-                viewModel = viewModel,
-                onShowAddEditRemoteDialog = { onNavigate(Screen.AddEditRemote(it)) },
-            )
+            ScrollableLazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 4.dp)
+            ) {
+                localBranches(
+                    branchesState = branchesState,
+                    selectedItem = selectedItem,
+                    viewModel = viewModel,
+                    onChangeDefaultUpstreamBranch = { onNavigate(Screen.BranchChangeUpstream(it)) },
+                    onRenameBranch = { onNavigate(Screen.BranchRename(it)) },
+                )
 
-            tags(
-                tagsState = tagsState,
-                selectedItem = selectedItem,
-                viewModel = viewModel,
-            )
+                remotes(
+                    remotesState = remotesState,
+                    viewModel = viewModel,
+                    onShowAddEditRemoteDialog = { onNavigate(Screen.AddEditRemote(it)) },
+                )
 
-            stashes(
-                stashesState = stashesState,
-                selectedItem = selectedItem,
-                viewModel = viewModel,
-            )
+                tags(
+                    tagsState = tagsState,
+                    selectedItem = selectedItem,
+                    viewModel = viewModel,
+                )
 
-            submodules(
-                submodulesState = submodulesState,
-                viewModel = viewModel,
-                onAddSubmodule = { onNavigate(Screen.SubmoduleAdd) },
-            )
+                stashes(
+                    stashesState = stashesState,
+                    selectedItem = selectedItem,
+                    viewModel = viewModel,
+                )
+
+                submodules(
+                    submodulesState = submodulesState,
+                    viewModel = viewModel,
+                    onAddSubmodule = { onNavigate(Screen.SubmoduleAdd) },
+                )
+            }
         }
     }
 }

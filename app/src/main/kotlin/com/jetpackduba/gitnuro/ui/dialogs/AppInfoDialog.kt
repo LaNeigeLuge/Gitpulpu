@@ -1,5 +1,6 @@
 package com.jetpackduba.gitnuro.ui.dialogs
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
@@ -8,15 +9,19 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import com.jetpackduba.gitnuro.AppConstants
 import com.jetpackduba.gitnuro.AppConstants.openSourceProjects
 import com.jetpackduba.gitnuro.Project
+import com.jetpackduba.gitnuro.app.generated.resources.Res
+import com.jetpackduba.gitnuro.app.generated.resources.ghost
 import com.jetpackduba.gitnuro.extensions.handOnHover
 import com.jetpackduba.gitnuro.theme.textButtonColors
 import com.jetpackduba.gitnuro.ui.components.ScrollableLazyColumn
 import com.jetpackduba.gitnuro.ui.components.TextLink
 import com.jetpackduba.gitnuro.ui.dialogs.base.MaterialDialog
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun AppInfoDialog(
@@ -35,10 +40,29 @@ fun AppInfoDialog(
             ) {
                 item {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            AppConstants.APP_NAME,
-                            style = MaterialTheme.typography.h2,
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        ) {
+                            Image(
+                                painter = painterResource(Res.drawable.ghost),
+                                contentDescription = null,
+                                modifier = Modifier.size(64.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+                            )
+
+                            Column {
+                                Text(
+                                    AppConstants.APP_NAME,
+                                    style = MaterialTheme.typography.h2,
+                                )
+                                Text(
+                                    "v${AppConstants.APP_VERSION}",
+                                    style = MaterialTheme.typography.body2,
+                                    color = MaterialTheme.colors.onBackground.copy(alpha = 0.6f),
+                                )
+                            }
+                        }
 
                         Text(
                             AppConstants.APP_DESCRIPTION,
@@ -47,7 +71,7 @@ fun AppInfoDialog(
                         )
 
                         Text(
-                            "Gitnuro has been possible thanks to the following open source projects:",
+                            "Gitpulpu has been possible thanks to the following open source projects:",
                             style = MaterialTheme.typography.body1,
                             modifier = Modifier.padding(vertical = 16.dp)
                         )

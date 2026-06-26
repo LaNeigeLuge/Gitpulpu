@@ -3,15 +3,21 @@
 package com.jetpackduba.gitnuro
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.LocalTextContextMenu
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
@@ -20,10 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import androidx.navigation3.runtime.NavKey
 import com.jetpackduba.gitnuro.app.generated.resources.Res
+import com.jetpackduba.gitnuro.app.generated.resources.ghost
 import com.jetpackduba.gitnuro.app.generated.resources.logo
 import com.jetpackduba.gitnuro.avatarproviders.GitHubAvatarProvider
 import com.jetpackduba.gitnuro.avatarproviders.GitLabAvatarProvider
@@ -39,6 +47,8 @@ import com.jetpackduba.gitnuro.di.TabComponent
 import com.jetpackduba.gitnuro.domain.TempFilesManager
 import com.jetpackduba.gitnuro.domain.credentials.CredentialsRequest
 import com.jetpackduba.gitnuro.domain.models.*
+import com.jetpackduba.gitnuro.domain.models.ui.LinesHeightType
+import com.jetpackduba.gitnuro.domain.models.ui.Theme
 import com.jetpackduba.gitnuro.domain.repositories.CompletedTask
 import com.jetpackduba.gitnuro.domain.services.AppSettingsService
 import com.jetpackduba.gitnuro.keybindings.KeybindingOption
@@ -111,36 +121,56 @@ class App @Inject constructor(
 
     @OptIn(ExperimentalFoundationApi::class)
     suspend fun start(args: Array<String>) {
-        initNativeDependencies()
-        logsRepository.initLogging()
-        initProxySettings()
-
-        Signers.set(GpgConfig.GpgFormat.OPENPGP, gpgSigner)
-        Signers.set(GpgConfig.GpgFormat.SSH, sshSigner)
-
-        val windowPlacement = WindowPlacement.Maximized //appSettingsRepository.windowPlacement.toWindowPlacement
-        val dirToOpen = getDirToOpen(args)
-
-        appEnvInfo.isFlatpak = args.contains("--flatpak")
-        appStateManager.loadRepositoriesTabs()
-
-        appViewModel.loadPersistedTabs()
-        LfsFactory.setInstance(lfsFactory)
-
-        if (dirToOpen != null)
-            addDirTab(dirToOpen)
-
-        val themeInitial = appSettings.theme.first()
-        val customThemeInitial = appSettings.customTheme.firstOrNull()
-        val scaleInitial = appSettings.scaleUi.firstOrNull()
-        val linesHeightTypeInitial = appSettings.linesHeightType.first()
-        val avatarProviderTypeInitial = appSettings.avatarProvider.first()
-        val dateFormatUseDefaultInitial = appSettings.dateFormatUseDefault.first()
-        val dateFormatCustomFormatInitial = appSettings.dateFormatCustomFormat.first()
-        val dateFormatIs24hInitial = appSettings.dateFormatIs24h.first()
-        val dateFormatUseRelativeInitial = appSettings.dateFormatUseRelative.first()
-
         application {
+            var initialized by remember { mutableStateOf(false) }
+
+            var themeInitial by remember { mutableStateOf(Theme.Dark) }
+            var customThemeInitial by remember { mutableStateOf<String?>(null) }
+            var scaleInitial by remember { mutableStateOf<Float?>(null) }
+            var linesHeightTypeInitial by remember { mutableStateOf(LinesHeightType.SPACED) }
+            var avatarProviderTypeInitial by remember { mutableStateOf(AvatarProviderType.GitHub) }
+            var dateFormatUseDefaultInitial by remember { mutableStateOf(true) }
+            var dateFormatCustomFormatInitial by remember { mutableStateOf("") }
+            var dateFormatIs24hInitial by remember { mutableStateOf(true) }
+            var dateFormatUseRelativeInitial by remember { mutableStateOf(true) }
+
+            LaunchedEffect(Unit) {
+                initNativeDependencies()
+                logsRepository.initLogging()
+                initProxySettings()
+
+                Signers.set(GpgConfig.GpgFormat.OPENPGP, gpgSigner)
+                Signers.set(GpgConfig.GpgFormat.SSH, sshSigner)
+
+                appEnvInfo.isFlatpak = args.contains("--flatpak")
+                appStateManager.loadRepositoriesTabs()
+
+                appViewModel.loadPersistedTabs()
+                LfsFactory.setInstance(lfsFactory)
+
+                val dirToOpen = getDirToOpen(args)
+                if (dirToOpen != null)
+                    addDirTab(dirToOpen)
+
+                themeInitial = appSettings.theme.first()
+                customThemeInitial = appSettings.customTheme.firstOrNull()
+                scaleInitial = appSettings.scaleUi.firstOrNull()
+                linesHeightTypeInitial = appSettings.linesHeightType.first()
+                avatarProviderTypeInitial = appSettings.avatarProvider.first()
+                dateFormatUseDefaultInitial = appSettings.dateFormatUseDefault.first()
+                dateFormatCustomFormatInitial = appSettings.dateFormatCustomFormat.first()
+                dateFormatIs24hInitial = appSettings.dateFormatIs24h.first()
+                dateFormatUseRelativeInitial = appSettings.dateFormatUseRelative.first()
+
+                initialized = true
+            }
+
+            if (!initialized) {
+                SplashWindow(onCloseRequest = ::exitApplication)
+                return@application
+            }
+
+            val windowPlacement = WindowPlacement.Maximized
             var isOpen by remember { mutableStateOf(true) }
             val theme by appSettings.theme.collectAsState(themeInitial)
             val customThemeRaw by appSettings.customTheme.collectAsState(customThemeInitial)
@@ -420,6 +450,54 @@ fun LoadingRepository(repoPath: String) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text("Opening repository", fontSize = 36.sp, color = MaterialTheme.colors.onBackground)
             Text(repoPath, fontSize = 24.sp, color = MaterialTheme.colors.onBackgroundSecondary)
+        }
+    }
+}
+
+@Composable
+private fun SplashWindow(onCloseRequest: () -> Unit) {
+    Window(
+        onCloseRequest = onCloseRequest,
+        title = AppConstants.APP_NAME,
+        state = rememberWindowState(
+            size = DpSize(360.dp, 280.dp),
+            position = WindowPosition(Alignment.Center),
+        ),
+        undecorated = true,
+        resizable = false,
+        transparent = true,
+        icon = painterResource(Res.drawable.logo),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color(0xFF121214)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+            ) {
+                Image(
+                    painter = painterResource(Res.drawable.ghost),
+                    contentDescription = null,
+                    modifier = Modifier.size(96.dp),
+                    colorFilter = ColorFilter.tint(Color(0xFFFC5000)),
+                )
+
+                Text(
+                    AppConstants.APP_NAME,
+                    color = Color.White,
+                    fontSize = 22.sp,
+                )
+
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = Color(0xFFFC5000),
+                    strokeWidth = 2.dp,
+                )
+            }
         }
     }
 }

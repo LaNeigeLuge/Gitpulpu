@@ -27,6 +27,8 @@ class AppViewModel @Inject constructor(
     val currentTab: StateFlow<TabInformation<RepositoryTabViewModel>?>
         field = MutableStateFlow<TabInformation<RepositoryTabViewModel>?>(null)
 
+    private var _tabsInitialized = false
+
     fun loadPersistedTabs() {
         val repositoriesSaved = appSettingsRepository.latestTabsOpened
 
@@ -47,6 +49,8 @@ class AppViewModel @Inject constructor(
             true -> tabs.value.first()
             false -> tabs.value.getOrNull(latestSelectedTabIndex) ?: tabs.value.first()
         }
+
+        _tabsInitialized = true
     }
 
     suspend fun addNewTabFromPath(path: String, selectTab: Boolean, tabToBeReplacedPath: String? = null) {
@@ -122,11 +126,18 @@ class AppViewModel @Inject constructor(
     }
 
     suspend fun updatePersistedTabs() {
+        if (!_tabsInitialized) return
+
         val tabs = tabs
             .value
             .filter { it.data.repositorySelectionState.value is RepositorySelectionState.Open }
 
+        if (tabs.isEmpty()) return
+
         val tabsPaths = tabs.map { it.data.repositoryPath.firstOrNull().orEmpty() }
+            .filter { it.isNotEmpty() }
+
+        if (tabsPaths.isEmpty()) return
 
         appSettingsRepository.latestTabsOpened = Json.encodeToString(tabsPaths)
         appSettingsRepository.latestRepositoryTabSelected = tabs.indexOf(currentTab.value)

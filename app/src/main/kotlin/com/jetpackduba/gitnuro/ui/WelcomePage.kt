@@ -163,7 +163,7 @@ fun WelcomeView(
             Image(
                 painter = painterResource(Res.drawable.ghost),
                 contentDescription = AppConstants.APP_NAME,
-                modifier = Modifier.size(72.dp),
+                modifier = Modifier.size(96.dp),
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
             )
 

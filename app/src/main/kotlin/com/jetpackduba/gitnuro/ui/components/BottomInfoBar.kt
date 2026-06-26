@@ -1,5 +1,6 @@
 package com.jetpackduba.gitnuro.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
@@ -7,12 +8,15 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import com.jetpackduba.gitnuro.AppConstants
 import com.jetpackduba.gitnuro.app.generated.resources.Res
 import com.jetpackduba.gitnuro.app.generated.resources.bottom_info_bar_app_version
 import com.jetpackduba.gitnuro.app.generated.resources.bottom_info_bar_update_available
+import com.jetpackduba.gitnuro.app.generated.resources.ghost
 import com.jetpackduba.gitnuro.updates.Update
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -41,6 +45,15 @@ fun BottomInfoBar(
                 modifier = Modifier.padding(end = 16.dp)
             )
         }
+
+        Image(
+            painter = painterResource(Res.drawable.ghost),
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground.copy(alpha = 0.4f)),
+        )
+
+        Spacer(Modifier.width(6.dp))
 
         Text(
             stringResource(Res.string.bottom_info_bar_app_version, AppConstants.APP_VERSION),
