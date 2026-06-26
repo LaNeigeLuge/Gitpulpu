@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.jetpackduba.gitnuro.app.generated.resources.Res
 import com.jetpackduba.gitnuro.app.generated.resources.undo
 import com.jetpackduba.gitnuro.domain.usecases.ResetType
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.onBackgroundSecondary
 import com.jetpackduba.gitnuro.ui.dialogs.base.IconBasedDialog
 import org.jetbrains.compose.resources.painterResource
@@ -91,9 +92,9 @@ fun RadioButtonText(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .width(380.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(AppShapes.medium)
             .background(MaterialTheme.colors.background)
-            .border(2.dp, color, RoundedCornerShape(8.dp))
+            .border(2.dp, color, AppShapes.medium)
             .onClick {
                 if (onClick != null) {
                     onClick()

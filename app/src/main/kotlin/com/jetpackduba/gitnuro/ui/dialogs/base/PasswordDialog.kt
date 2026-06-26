@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.jetpackduba.gitnuro.extensions.handOnHover
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.app.generated.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -84,7 +85,7 @@ fun PasswordDialog(
             Box(
                 modifier = Modifier
                     .padding(top = 8.dp)
-                    .clip(RoundedCornerShape(4.dp))
+                    .clip(AppShapes.small)
                     .background(MaterialTheme.colors.error)
                     .align(Alignment.CenterHorizontally)
                     .padding(4.dp)

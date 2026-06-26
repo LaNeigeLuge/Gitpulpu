@@ -54,8 +54,8 @@ class AppSettingsService @Inject constructor(
         const val DEFAULT_DATE_IS_24H = true
         const val DEFAULT_DATE_USE_RELATIVE = true
         const val DEFAULT_DATE_CUSTOM_FORMAT = "dd MMM yyyy"
-        val DEFAULT_AVATAR_PROVIDER = AvatarProviderType.Gravatar
-        const val DEFAULT_SWAP_STATUS_PANES = false
+        val DEFAULT_AVATAR_PROVIDER = AvatarProviderType.GitHub
+        const val DEFAULT_SWAP_STATUS_PANES = true
         const val DEFAULT_SHOW_CHANGES_AS_TREE = false
         const val DEFAULT_DIFF_DISPLAY_FULL_FILE = false
         val DEFAULT_DIFF_TEXT_VIEW_TYPE = DiffTextViewType.Unified

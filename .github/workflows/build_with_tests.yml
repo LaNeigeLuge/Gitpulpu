@@ -1,7 +1,4 @@
-# Workflow to run with every commit added to the main branch.
-# Windows, Mac-os and LibSSH are not built to avoid wasting CI minutes, as it takes quite some time.
-
-name: Test Build
+name: CI
 
 on:
   push:
@@ -12,28 +9,64 @@ on:
 permissions:
   contents: read
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+
       - name: Set up JDK 21
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'jetbrains'
-          architecture: x64
-      - name: Build rust
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
         with:
-          arguments: rustTasks
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+          workspaces: rs
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build Rust
+        run: ./gradlew rustTasks
+
+      - name: Build
+        run: ./gradlew build -x test
+
+      - name: Test
+        run: ./gradlew test
+
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
-          arguments: build
-      - name: Tests
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run Detekt
+        run: ./gradlew detekt
+        continue-on-error: true
+
+      - name: Upload Detekt report
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          arguments: test
+          name: detekt-report
+          path: "**/build/reports/detekt/"
+          retention-days: 14

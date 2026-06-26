@@ -14,7 +14,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -23,7 +22,7 @@ import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
-import com.jetpackduba.gitnuro.theme.isDark
+import com.jetpackduba.gitnuro.theme.AppShapes
 
 @Composable
 fun InstantTooltip(
@@ -82,20 +81,14 @@ fun InstantTooltip(
             Row(
                 modifier = Modifier
                     .padding(padding)
-                    .shadow(8.dp)
-                    .clip(MaterialTheme.shapes.small)
+                    .clip(AppShapes.medium)
                     .background(MaterialTheme.colors.background)
+                    .border(
+                        1.dp,
+                        MaterialTheme.colors.onBackground.copy(alpha = 0.15f),
+                        shape = AppShapes.medium
+                    )
                     .width(IntrinsicSize.Max)
-                    .run {
-                        if (MaterialTheme.colors.isDark) {
-                            this.border(
-                                2.dp,
-                                MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
-                                shape = MaterialTheme.shapes.small
-                            )
-                        } else
-                            this
-                    }
                     .padding(8.dp),
             ) {
                 Text(

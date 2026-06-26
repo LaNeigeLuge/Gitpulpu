@@ -32,7 +32,7 @@ fun AvatarImage(
     ) {
         val avatarProviderUrl = personIdent
             .email
-            ?.let { email -> current.getAvatarUrl(email.sha256) }
+            ?.let { email -> current.getAvatarUrl(email, email.sha256) }
 
         var isSuccessfulLoad by remember { mutableStateOf(false) }
 

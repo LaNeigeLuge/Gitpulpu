@@ -20,6 +20,7 @@ import com.jetpackduba.gitnuro.extensions.backgroundIf
 import com.jetpackduba.gitnuro.extensions.handMouseClickable
 import com.jetpackduba.gitnuro.keybindings.KeybindingOption
 import com.jetpackduba.gitnuro.keybindings.matchesBinding
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.backgroundSelected
 import com.jetpackduba.gitnuro.ui.components.AdjustableOutlinedTextField
 import com.jetpackduba.gitnuro.ui.dialogs.base.MaterialDialog
@@ -132,7 +133,7 @@ private fun QuickActionView(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(4.dp))
+                            .clip(AppShapes.small)
                             .backgroundIf(selectedIndex == index, MaterialTheme.colors.backgroundSelected)
                             .handMouseClickable { onAction(item.type) }
                     ) {

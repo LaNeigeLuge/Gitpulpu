@@ -34,6 +34,7 @@ import com.jetpackduba.gitnuro.extensions.toSmartSystemString
 import com.jetpackduba.gitnuro.repositoryopen.CommitChangesAction
 import com.jetpackduba.gitnuro.repositoryopen.CommitChangesState
 import com.jetpackduba.gitnuro.repositoryopen.RepositoryOpenViewModel
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.onBackgroundSecondary
 import com.jetpackduba.gitnuro.theme.tertiarySurface
 import com.jetpackduba.gitnuro.ui.components.*
@@ -206,7 +207,7 @@ private fun MessageAuthorFooter(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(4.dp))
+            .clip(AppShapes.small)
             .background(MaterialTheme.colors.background),
     ) {
         SelectionContainer {

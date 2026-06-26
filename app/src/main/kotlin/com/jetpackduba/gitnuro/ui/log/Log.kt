@@ -22,11 +22,16 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -69,13 +74,16 @@ import org.eclipse.jgit.lib.RepositoryState
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
+// Caldera-inspired graph palette — warm and readable, not neon
 private val colors = listOf(
-    Color(0xFF42a5f5),
-    Color(0xFFef5350),
-    Color(0xFFe78909c),
-    Color(0xFFff7043),
-    Color(0xFF66bb6a),
-    Color(0xFFec407a),
+    Color(0xFFE06020),  // Burnt Orange — primary lane
+    Color(0xFF7B8BDD),  // Muted Periwinkle — branches
+    Color(0xFF5AAA70),  // Sage Green — feature branches
+    Color(0xFFCC9530),  // Warm Gold — hotfix/release
+    Color(0xFFD06878),  // Dusty Rose — secondary
+    Color(0xFF4AA8B8),  // Teal — other lanes
+    Color(0xFF9980CC),  // Muted Lavender — extra lane
+    Color(0xFFD88840),  // Clay — extra lane
 )
 
 private const val CANVAS_MIN_WIDTH = 100
@@ -849,6 +857,13 @@ private fun CommitLine(
                     .background(MaterialTheme.colors.background)
                     .backgroundIf(isSelected, MaterialTheme.colors.backgroundSelected)
             ) {
+                // Branch color accent strip — solid color, Caldera style: shout or stay silent
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(3.dp)
+                        .background(nodeColor)
+                )
 
                 if (matchesSearchFilter == true) {
                     Box(
@@ -1079,50 +1094,63 @@ fun CommitsGraph(
         Canvas(
             modifier = Modifier.fillMaxSize()
         ) {
+            val lineWidth = 2.5f * density
+            val glowWidth = 6f * density
+            // Dashed pattern for stash entries
+            val dashEffect = if (isStash) PathEffect.dashPathEffect(
+                floatArrayOf(6f * density, 4f * density), 0f
+            ) else null
+
             clipRect {
                 if (plotCommit.childCount > 0) {
-                    drawLine(
-                        color = colors[itemPosition % colors.size],
-                        start = Offset(laneWidthWithDensity * (itemPosition + 1), this.center.y),
-                        end = Offset(laneWidthWithDensity * (itemPosition + 1), 0f),
-                        strokeWidth = 2f * density,
-                    )
+                    val color = colors[itemPosition % colors.size]
+                    val start = Offset(laneWidthWithDensity * (itemPosition + 1), this.center.y)
+                    val end = Offset(laneWidthWithDensity * (itemPosition + 1), 0f)
+                    if (isStash) {
+                        drawDashedLine(color, start, end, lineWidth, dashEffect!!)
+                    } else {
+                        drawGlowLine(color, start, end, lineWidth, glowWidth)
+                    }
                 }
 
                 forkingOffLanes.forEach { plotLane ->
-                    drawLine(
-                        color = colors[plotLane % colors.size],
-                        start = Offset(laneWidthWithDensity * (itemPosition + 1), this.center.y),
-                        end = Offset(laneWidthWithDensity * (plotLane + 1), 0f),
-                        strokeWidth = 2f * density,
-                    )
+                    val color = colors[plotLane % colors.size]
+                    val start = Offset(laneWidthWithDensity * (itemPosition + 1), this.center.y)
+                    val end = Offset(laneWidthWithDensity * (plotLane + 1), 0f)
+                    if (isStash) {
+                        drawDashedLine(color, start, end, lineWidth, dashEffect!!)
+                    } else {
+                        drawGlowLine(color, start, end, lineWidth, glowWidth)
+                    }
                 }
 
                 mergingLanes.forEach { plotLane ->
-                    drawLine(
-                        color = colors[plotLane % colors.size],
-                        start = Offset(laneWidthWithDensity * (plotLane + 1), this.size.height),
-                        end = Offset(laneWidthWithDensity * (itemPosition + 1), this.center.y),
-                        strokeWidth = 2f * density,
-                    )
+                    val color = colors[plotLane % colors.size]
+                    val start = Offset(laneWidthWithDensity * (plotLane + 1), this.size.height)
+                    val end = Offset(laneWidthWithDensity * (itemPosition + 1), this.center.y)
+                    if (isStash) {
+                        drawDashedLine(color, start, end, lineWidth, dashEffect!!)
+                    } else {
+                        drawGlowLine(color, start, end, lineWidth, glowWidth)
+                    }
                 }
 
                 if (plotCommit.commit.parentCount > 0) {
-                    drawLine(
-                        color = colors[itemPosition % colors.size],
-                        start = Offset(laneWidthWithDensity * (itemPosition + 1), this.center.y),
-                        end = Offset(laneWidthWithDensity * (itemPosition + 1), this.size.height),
-                        strokeWidth = 2f * density,
-                    )
+                    val color = colors[itemPosition % colors.size]
+                    val start = Offset(laneWidthWithDensity * (itemPosition + 1), this.center.y)
+                    val end = Offset(laneWidthWithDensity * (itemPosition + 1), this.size.height)
+                    if (isStash) {
+                        drawDashedLine(color, start, end, lineWidth, dashEffect!!)
+                    } else {
+                        drawGlowLine(color, start, end, lineWidth, glowWidth)
+                    }
                 }
 
                 passingLanes.forEach { plotLane ->
-                    drawLine(
-                        color = colors[plotLane % colors.size],
-                        start = Offset(laneWidthWithDensity * (plotLane + 1), 0f),
-                        end = Offset(laneWidthWithDensity * (plotLane + 1), this.size.height),
-                        strokeWidth = 2f * density,
-                    )
+                    val color = colors[plotLane % colors.size]
+                    val start = Offset(laneWidthWithDensity * (plotLane + 1), 0f)
+                    val end = Offset(laneWidthWithDensity * (plotLane + 1), this.size.height)
+                    drawGlowLine(color, start, end, lineWidth, glowWidth)
                 }
             }
         }
@@ -1138,6 +1166,55 @@ fun CommitsGraph(
     }
 }
 
+/**
+ * Draws a dashed line for stash entries — no glow, just a clean dotted stroke.
+ */
+private fun DrawScope.drawDashedLine(
+    color: Color,
+    start: Offset,
+    end: Offset,
+    strokeWidth: Float,
+    pathEffect: PathEffect,
+) {
+    drawLine(
+        color = color.copy(alpha = 0.7f),
+        start = start,
+        end = end,
+        strokeWidth = strokeWidth,
+        cap = StrokeCap.Round,
+        pathEffect = pathEffect,
+    )
+}
+
+/**
+ * Draws a line with a soft glow behind it — the glow is the same color at low alpha,
+ * drawn wider behind the main stroke. Gives branch lines a luminous, organic feel.
+ */
+private fun DrawScope.drawGlowLine(
+    color: Color,
+    start: Offset,
+    end: Offset,
+    strokeWidth: Float,
+    glowWidth: Float,
+) {
+    // Glow layer — visible halo behind the line
+    drawLine(
+        color = color.copy(alpha = 0.25f),
+        start = start,
+        end = end,
+        strokeWidth = glowWidth,
+        cap = StrokeCap.Round,
+    )
+    // Main line — round caps for organic feel
+    drawLine(
+        color = color,
+        start = start,
+        end = end,
+        strokeWidth = strokeWidth,
+        cap = StrokeCap.Round,
+    )
+}
+
 @Composable
 fun CommitNode(
     modifier: Modifier = Modifier,
@@ -1150,6 +1227,12 @@ fun CommitNode(
         Box(
             modifier = modifier
                 .size(30.dp)
+                .drawBehind {
+                    drawCircle(
+                        color = color.copy(alpha = 0.30f),
+                        radius = size.minDimension / 2f + 3f,
+                    )
+                }
                 .border(2.dp, color, shape = CircleShape)
                 .clip(CircleShape)
                 .background(MaterialTheme.colors.background),
@@ -1170,6 +1253,12 @@ fun CommitNode(
             Box(
                 modifier = modifier
                     .size(30.dp)
+                    .drawBehind {
+                        drawCircle(
+                            color = color.copy(alpha = 0.30f),
+                            radius = size.minDimension / 2f + 3f,
+                        )
+                    }
                     .border(2.dp, color, shape = CircleShape)
                     .clip(CircleShape)
             ) {
@@ -1198,21 +1287,46 @@ fun UncommittedChangesGraphNode(
         modifier = modifier
             .backgroundIf(isSelected, MaterialTheme.colors.backgroundSelected)
     ) {
+        val bgColor = MaterialTheme.colors.background
+
         Canvas(
             modifier = Modifier.fillMaxSize()
         ) {
             clipRect {
-                if (hasPreviousCommits) drawLine(
-                    color = colors[0],
-                    start = Offset(laneWidthWithDensity, this.center.y),
-                    end = Offset(laneWidthWithDensity, this.size.height),
-                    strokeWidth = 2f * density,
+                val lineWidth = 2.5f * density
+                val glowWidth = 6f * density
+                val nodeCenter = Offset(laneWidthWithDensity, this.center.y)
+                val nodeRadius = 13f * density
+                val ringWidth = 2.5f * density
+
+                if (hasPreviousCommits) {
+                    drawGlowLine(
+                        colors[0],
+                        start = nodeCenter,
+                        end = Offset(laneWidthWithDensity, this.size.height),
+                        strokeWidth = lineWidth,
+                        glowWidth = glowWidth,
+                    )
+                }
+
+                // Glow behind the ring
+                drawCircle(
+                    color = colors[0].copy(alpha = 0.25f),
+                    radius = nodeRadius + 4f * density,
+                    center = nodeCenter,
                 )
 
+                // Hollow ring: fill with background, then stroke the border
+                drawCircle(
+                    color = bgColor,
+                    radius = nodeRadius,
+                    center = nodeCenter,
+                )
                 drawCircle(
                     color = colors[0],
-                    radius = 15f * density,
-                    center = Offset(laneWidthWithDensity, this.center.y),
+                    radius = nodeRadius,
+                    center = nodeCenter,
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = ringWidth),
                 )
             }
         }
@@ -1256,6 +1370,19 @@ fun BranchChip(
         )
     }
 
+    // Local = PC icon + full color, Remote = cloud icon + muted color
+    val chipIcon = if (ref.isLocal) Res.drawable.computer else Res.drawable.cloud
+    val chipColor = if (ref.isRemote) {
+        // Remote branches: darken + desaturate the color slightly
+        color.copy(
+            red = color.red * 0.7f,
+            green = color.green * 0.7f,
+            blue = color.blue * 0.7f,
+        )
+    } else {
+        color
+    }
+
     var endingContent: @Composable () -> Unit = {}
     if (isCurrentBranch) {
         endingContent = {
@@ -1263,7 +1390,7 @@ fun BranchChip(
                 painter = painterResource(Res.drawable.location),
                 contentDescription = null,
                 modifier = Modifier.padding(end = 6.dp),
-                tint = MaterialTheme.colors.primaryVariant,
+                tint = Color.White,
             )
         }
     }
@@ -1275,9 +1402,9 @@ fun BranchChip(
             },
             orientation = Orientation.Vertical,
         ),
-        color = color,
+        color = chipColor,
         text = ref.logName,
-        icon = Res.drawable.branch,
+        icon = chipIcon,
         onCheckoutRef = onCheckoutBranch,
         contextMenuItemsList = contextMenuItemsList,
         endingContent = endingContent,
@@ -1340,8 +1467,8 @@ fun Chip(
     Box(
         modifier = Modifier
             .padding(horizontal = 4.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .border(width = 2.dp, color = color, shape = RoundedCornerShape(16.dp))
+            .clip(AppShapes.pill)
+            .background(color)
             .combinedClickable(onDoubleClick = onCheckoutRef, onClick = {})
             .handOnHover()
     ) {
@@ -1352,22 +1479,20 @@ fun Chip(
                 modifier = modifier,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(modifier = Modifier.background(color = color)) {
-                    Icon(
-                        modifier = Modifier
-                            .padding(6.dp)
-                            .size(14.dp),
-                        painter = painterResource(icon),
-                        contentDescription = null,
-                        tint = MaterialTheme.colors.background,
-                    )
-                }
+                Icon(
+                    modifier = Modifier
+                        .padding(start = 8.dp, top = 4.dp, bottom = 4.dp)
+                        .size(14.dp),
+                    painter = painterResource(icon),
+                    contentDescription = null,
+                    tint = Color.White,
+                )
                 Text(
                     text = text,
                     style = MaterialTheme.typography.body2,
-                    color = MaterialTheme.colors.onBackground,
+                    color = Color.White,
                     maxLines = 1,
-                    modifier = Modifier.padding(horizontal = 6.dp)
+                    modifier = Modifier.padding(start = 4.dp, end = 8.dp)
                 )
 
                 endingContent()

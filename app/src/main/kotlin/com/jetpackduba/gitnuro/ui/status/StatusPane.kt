@@ -45,6 +45,7 @@ import com.jetpackduba.gitnuro.extensions.iconColor
 import com.jetpackduba.gitnuro.extensions.setClipboardText
 import com.jetpackduba.gitnuro.keybindings.KeybindingOption
 import com.jetpackduba.gitnuro.keybindings.matchesBinding
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.abortButton
 import com.jetpackduba.gitnuro.theme.textFieldColors
 import com.jetpackduba.gitnuro.ui.components.*
@@ -607,7 +608,7 @@ fun UncommittedChangesButtons(
                     onCommit()
                 },
                 enabled = canCommit || (canAmend && isAmend),
-                shape = RoundedCornerShape(4.dp)
+                shape = AppShapes.small
             )
         }
     }

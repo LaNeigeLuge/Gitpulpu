@@ -21,7 +21,7 @@ val linuxX64Target = "x86_64-unknown-linux-gnu"
 // Remember to update Constants.APP_VERSION when changing this version
 val projectVersion = "1.5.0"
 
-val projectName = "Gitnuro"
+val projectName = "Gitpulpu"
 
 // Required for JPackage, as it doesn't accept additional suffixes after the version.
 val projectVersionSimplified = "1.5.0"
@@ -154,6 +154,10 @@ compose.desktop {
 
             windows {
                 iconFile.set(project.file("icons/icon.ico"))
+            }
+
+            linux {
+                iconFile.set(project.file("icons/logo.svg"))
             }
 
             macOS {

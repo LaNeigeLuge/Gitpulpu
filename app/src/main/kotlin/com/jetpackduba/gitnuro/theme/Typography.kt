@@ -32,33 +32,39 @@ val notoSansMonoFontFamily = FontFamily(
     Font("fonts/NotoSansMono/NotoSansMono-BoldItalic.ttf", FontWeight.Bold, FontStyle.Italic),
 )
 
-const val LETTER_SPACING = 0.5
+const val LETTER_SPACING = 0.3
+const val HEADING_LETTER_SPACING = 0.5
 
 @Composable
 fun typography(composeColors: Colors) = Typography(
     defaultFontFamily = interFontFamily,
     h1 = TextStyle(
         fontSize = 32.sp,
+        fontWeight = FontWeight.Bold,
         color = composeColors.onBackground,
-        letterSpacing = LETTER_SPACING.sp,
+        letterSpacing = HEADING_LETTER_SPACING.sp,
     ),
     h2 = TextStyle(
         fontSize = 24.sp,
+        fontWeight = FontWeight.SemiBold,
         color = composeColors.onBackground,
-        letterSpacing = LETTER_SPACING.sp,
+        letterSpacing = HEADING_LETTER_SPACING.sp,
     ),
     h3 = TextStyle(
         fontSize = 20.sp,
+        fontWeight = FontWeight.SemiBold,
         color = composeColors.onBackground,
-        letterSpacing = LETTER_SPACING.sp,
+        letterSpacing = HEADING_LETTER_SPACING.sp,
     ),
     h4 = TextStyle(
         fontSize = 16.sp,
+        fontWeight = FontWeight.Medium,
         color = composeColors.onBackground,
         letterSpacing = LETTER_SPACING.sp,
     ),
     body1 = TextStyle(
         fontSize = 14.sp,
+        fontWeight = FontWeight.Medium,
         color = composeColors.onBackground,
         letterSpacing = LETTER_SPACING.sp,
     ),
@@ -70,6 +76,7 @@ fun typography(composeColors: Colors) = Typography(
     ),
     caption = TextStyle(
         fontSize = 11.sp,
+        fontWeight = FontWeight.Medium,
         color = composeColors.onBackground,
         letterSpacing = LETTER_SPACING.sp,
     )

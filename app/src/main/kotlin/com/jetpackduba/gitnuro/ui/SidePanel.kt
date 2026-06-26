@@ -2,14 +2,12 @@
 
 package com.jetpackduba.gitnuro.ui
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -472,14 +470,28 @@ private fun Branch(
             onClick = onBranchClicked,
             onDoubleClick = onBranchDoubleClicked,
         ) {
-            if (isCurrentBranch) {
-                Text(
-                    text = stringResource(Res.string.side_pane_local_branches_current_branch_label),
-                    color = MaterialTheme.colors.onBackgroundSecondary,
-                    style = MaterialTheme.typography.caption,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(horizontal = 16.dp),
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 8.dp),
+            ) {
+                // Local indicator
+                Icon(
+                    painter = painterResource(Res.drawable.computer),
+                    contentDescription = "Local",
+                    modifier = Modifier.size(12.dp),
+                    tint = MaterialTheme.colors.onBackgroundSecondary.copy(alpha = 0.6f),
                 )
+
+                if (isCurrentBranch) {
+                    Icon(
+                        painter = painterResource(Res.drawable.done),
+                        contentDescription = "Current",
+                        modifier = Modifier.padding(start = 4.dp).size(12.dp),
+                        tint = MaterialTheme.colors.primary,
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
             }
         }
     }
@@ -553,7 +565,21 @@ private fun RemoteBranches(
             iconResourcePath = Res.drawable.branch,
             onClick = onBranchClicked,
             onDoubleClick = onCheckoutBranch,
-        )
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 8.dp),
+            ) {
+                Icon(
+                    painter = painterResource(Res.drawable.cloud),
+                    contentDescription = "Remote",
+                    modifier = Modifier.size(12.dp),
+                    tint = MaterialTheme.colors.onBackgroundSecondary.copy(alpha = 0.6f),
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+        }
     }
 }
 

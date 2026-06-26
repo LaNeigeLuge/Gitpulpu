@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
@@ -41,7 +40,7 @@ import com.jetpackduba.gitnuro.app.generated.resources.cut
 import com.jetpackduba.gitnuro.app.generated.resources.paste
 import com.jetpackduba.gitnuro.keybindings.KeybindingOption
 import com.jetpackduba.gitnuro.keybindings.matchesBinding
-import com.jetpackduba.gitnuro.theme.isDark
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.onBackgroundSecondary
 import org.jetbrains.compose.resources.painterResource
 import java.awt.event.KeyEvent
@@ -204,21 +203,15 @@ fun showPopup(
 
         Box(
             modifier = Modifier
-                .shadow(8.dp)
-                .clip(MaterialTheme.shapes.small)
+                .clip(AppShapes.medium)
                 .background(MaterialTheme.colors.background)
+                .border(
+                    1.dp,
+                    MaterialTheme.colors.onBackground.copy(alpha = 0.15f),
+                    shape = AppShapes.medium
+                )
                 .width(IntrinsicSize.Max)
                 .widthIn(min = 180.dp)
-                .run {
-                    if (MaterialTheme.colors.isDark) {
-                        this.border(
-                            2.dp,
-                            MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
-                            shape = MaterialTheme.shapes.small
-                        )
-                    } else
-                        this
-                }
                 .focusRequester(focusRequester)
                 .focusable()
                 .onPreviewKeyEvent { keyEvent ->
@@ -425,25 +418,18 @@ class AppContextMenuRepresentation : ContextMenuRepresentation {
                 focusManager = LocalFocusManager.current
                 inputModeManager = LocalInputModeManager.current
 
-                val border = if (MaterialTheme.colors.isDark) {
-                    BorderStroke(2.dp, MaterialTheme.colors.onBackgroundSecondary.copy(alpha = 0.2f))
-                } else
-                    null
-
                 Column(
                     modifier = Modifier
-                        .shadow(8.dp)
-                        .clip(MaterialTheme.shapes.small)
+                        .clip(AppShapes.medium)
                         .background(MaterialTheme.colors.background)
+                        .border(
+                            1.dp,
+                            MaterialTheme.colors.onBackground.copy(alpha = 0.15f),
+                            shape = AppShapes.medium
+                        )
                         .width(IntrinsicSize.Max)
                         .widthIn(min = 180.dp)
                         .verticalScroll(rememberScrollState())
-                        .run {
-                            if (border != null)
-                                border(border, MaterialTheme.shapes.small)
-                            else
-                                this
-                        }
 
                 ) {
                     items().forEach { item ->

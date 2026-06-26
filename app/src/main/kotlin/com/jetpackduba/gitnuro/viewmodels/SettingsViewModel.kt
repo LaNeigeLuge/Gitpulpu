@@ -160,7 +160,7 @@ class SettingsViewModel @Inject constructor(
             dateFormatCustomFormat = "",
             dateFormatIs24h = false,
             dateFormatUseRelative = false,
-            avatarProvider = AvatarProviderType.Gravatar,
+            avatarProvider = AvatarProviderType.GitHub,
             swapStatusPanes = false,
             pullWithRebase = false,
             pushWithLease = false,

@@ -10,8 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.jetpackduba.gitnuro.theme.isDark
-import com.jetpackduba.gitnuro.theme.onBackgroundSecondary
+import com.jetpackduba.gitnuro.theme.AppShapes
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -20,15 +19,11 @@ fun DelayedTooltip(text: String?, modifier: Modifier = Modifier, content: @Compo
         modifier = modifier,
         tooltip = {
             if (text != null) {
-                val border = if (MaterialTheme.colors.isDark) {
-                    BorderStroke(2.dp, MaterialTheme.colors.onBackgroundSecondary.copy(alpha = 0.2f))
-                } else
-                    null
-
                 Card(
                     backgroundColor = MaterialTheme.colors.background,
-                    border = border,
-                    elevation = 10.dp,
+                    border = BorderStroke(1.dp, MaterialTheme.colors.onBackground.copy(alpha = 0.15f)),
+                    elevation = 0.dp,
+                    shape = AppShapes.medium,
                 ) {
                     Text(
                         text = text,

@@ -4,6 +4,7 @@ package com.jetpackduba.gitnuro.theme
 
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Shapes
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
@@ -58,9 +59,16 @@ fun AppTheme(
     val composeColors = theme.toComposeColors()
     val compositionValues = arrayOf(LocalLinesHeight provides lineHeight)
 
+    val shapes = Shapes(
+        small = AppShapes.small,
+        medium = AppShapes.medium,
+        large = AppShapes.large,
+    )
+
     CompositionLocalProvider(values = compositionValues) {
         MaterialTheme(
             colors = composeColors,
+            shapes = shapes,
             content = content,
             typography = typography(composeColors),
         )

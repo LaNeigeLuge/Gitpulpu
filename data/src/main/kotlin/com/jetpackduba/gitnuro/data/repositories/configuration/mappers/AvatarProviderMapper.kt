@@ -6,12 +6,16 @@ import javax.inject.Inject
 
 private const val NONE = "none"
 private const val GRAVATAR = "gravatar"
+private const val GITHUB = "github"
+private const val GITLAB = "gitlab"
 
 class AvatarProviderMapper @Inject constructor(): DataMapper<AvatarProviderType?, String?>  {
     override fun toData(value: AvatarProviderType?): String? {
         return when (value) {
             AvatarProviderType.None -> NONE
             AvatarProviderType.Gravatar -> GRAVATAR
+            AvatarProviderType.GitHub -> GITHUB
+            AvatarProviderType.GitLab -> GITLAB
             null -> null
         }
     }
@@ -20,6 +24,8 @@ class AvatarProviderMapper @Inject constructor(): DataMapper<AvatarProviderType?
         return when (value) {
             NONE -> AvatarProviderType.None
             GRAVATAR -> AvatarProviderType.Gravatar
+            GITHUB -> AvatarProviderType.GitHub
+            GITLAB -> AvatarProviderType.GitLab
             null -> null
             else -> throw IllegalStateException("Unhandled avatar provider $value")
         }

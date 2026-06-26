@@ -24,6 +24,7 @@ import com.jetpackduba.gitnuro.app.generated.resources.Res
 import com.jetpackduba.gitnuro.app.generated.resources.generic_save_as_default
 import com.jetpackduba.gitnuro.app.generated.resources.search
 import com.jetpackduba.gitnuro.domain.models.CloneState
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.outlinedTextFieldColors
 import com.jetpackduba.gitnuro.theme.textButtonColors
 import com.jetpackduba.gitnuro.ui.components.AdjustableOutlinedTextField
@@ -241,7 +242,7 @@ private fun CloneDialogView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
-                    .clip(RoundedCornerShape(4.dp))
+                    .clip(AppShapes.small)
                     .background(MaterialTheme.colors.error)
             ) {
                 Text(
@@ -378,7 +379,7 @@ private fun TextInput(
     focusRequester: FocusRequester,
     focusProperties: FocusProperties.() -> Unit,
     onValueChange: (TextFieldValue) -> Unit,
-    textFieldShape: Shape = RoundedCornerShape(4.dp),
+    textFieldShape: Shape = AppShapes.small,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     Column(

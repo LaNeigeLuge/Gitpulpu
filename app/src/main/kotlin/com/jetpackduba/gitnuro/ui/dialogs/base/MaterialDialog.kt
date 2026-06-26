@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jetpackduba.gitnuro.keybindings.KeybindingOption
 import com.jetpackduba.gitnuro.keybindings.matchesBinding
+import com.jetpackduba.gitnuro.theme.AppShapes
 
 @Composable
 fun MaterialDialog(
@@ -51,8 +52,8 @@ fun MaterialDialog(
                 } else
                     false
             }
-            .border(1.dp, MaterialTheme.colors.onBackground.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
-            .clip(RoundedCornerShape(8.dp))
+            .border(1.dp, MaterialTheme.colors.onBackground.copy(alpha = 0.1f), AppShapes.large)
+            .clip(AppShapes.large)
             .background(background)
             .padding(
                 horizontal = paddingHorizontal,

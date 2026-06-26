@@ -19,6 +19,7 @@ coroutines = "1.10.2"
 datastore = "1.2.1"
 jna = "5.19.1"
 androidx-viewmodel = "2.10.0"
+detekt = "1.23.7"
 
 [libraries]
 compose-desktop-linux-arm64 = { group = "org.jetbrains.compose.desktop", name = "desktop-jvm-linux-arm64", version.ref = "compose" }
@@ -74,6 +75,9 @@ androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecy
 
 jna = { group = "net.java.dev.jna", name = "jna", version.ref="jna" }
 
+detekt-gradle-plugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detekt" }
+detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
+
 [plugins]
 
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -81,3 +85,4 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

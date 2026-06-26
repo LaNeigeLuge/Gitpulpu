@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.onPreviewKeyEvent
@@ -149,7 +150,16 @@ fun RepositoryOpenPage(
             modifier = Modifier
                 .height(1.dp)
                 .fillMaxWidth()
-                .background(MaterialTheme.colors.primaryVariant.copy(alpha = 0.2f))
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(
+                            MaterialTheme.colors.primary.copy(alpha = 0.0f),
+                            MaterialTheme.colors.primary.copy(alpha = 0.25f),
+                            MaterialTheme.colors.primary.copy(alpha = 0.25f),
+                            MaterialTheme.colors.primary.copy(alpha = 0.0f),
+                        )
+                    )
+                )
         )
 
 

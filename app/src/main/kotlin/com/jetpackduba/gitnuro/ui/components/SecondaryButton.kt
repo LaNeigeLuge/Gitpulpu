@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -23,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.jetpackduba.gitnuro.extensions.handMouseClickable
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.tertiarySurface
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -47,7 +47,7 @@ fun SecondaryButton(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(4.dp))
+            .clip(AppShapes.small)
             .background(backgroundButton)
             .handMouseClickable { onClick() },
     ) {
@@ -104,7 +104,7 @@ fun SecondaryButtonCompactable(
 
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(4.dp))
+            .clip(AppShapes.small)
             .background(backgroundColorState)
             .hoverable(hoverInteraction)
             .handMouseClickable { onClick() }

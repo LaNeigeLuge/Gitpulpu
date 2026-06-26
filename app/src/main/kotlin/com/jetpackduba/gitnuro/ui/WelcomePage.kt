@@ -39,6 +39,7 @@ import com.jetpackduba.gitnuro.domain.extensions.dirPath
 import com.jetpackduba.gitnuro.domain.extensions.lowercaseContains
 import com.jetpackduba.gitnuro.keybindings.KeybindingOption
 import com.jetpackduba.gitnuro.keybindings.matchesBinding
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.AppTheme
 import com.jetpackduba.gitnuro.theme.backgroundSelected
 import com.jetpackduba.gitnuro.theme.onBackgroundSecondary
@@ -159,6 +160,13 @@ fun WelcomeView(
             verticalArrangement = Arrangement.spacedBy(16.dp, BiasAlignment.Vertical(-0.5f)),
         ) {
 
+            Image(
+                painter = painterResource(Res.drawable.ghost),
+                contentDescription = AppConstants.APP_NAME,
+                modifier = Modifier.size(72.dp),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+            )
+
             Text(
                 text = AppConstants.APP_NAME,
                 style = MaterialTheme.typography.h1,
@@ -258,7 +266,7 @@ fun HomeButtons(
             title = stringResource(Res.string.home_button_source_code),
             painter = painterResource(Res.drawable.code),
             onClick = {
-                onOpenUrlInBrowser("https://github.com/JetpackDuba/Gitnuro")
+                onOpenUrlInBrowser("https://github.com/LaNeigeLuge/Gitpulpu")
             }
         )
 
@@ -266,7 +274,7 @@ fun HomeButtons(
             title = stringResource(Res.string.home_button_report_bug),
             painter = painterResource(Res.drawable.bug),
             onClick = {
-                onOpenUrlInBrowser("https://github.com/JetpackDuba/Gitnuro/issues")
+                onOpenUrlInBrowser("https://github.com/LaNeigeLuge/Gitpulpu/issues")
             }
         )
 
@@ -450,7 +458,7 @@ fun RecentRepositoriesList(
 
                     Row(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
+                            .clip(AppShapes.small)
                             .fillMaxWidth()
                             .hoverable(hoverInteraction)
                             .handMouseClickable { onOpenKnownRepository(repo) }

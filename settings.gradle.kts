@@ -24,7 +24,7 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention").version("1.0.0")
 }
 
-rootProject.name = "Gitnuro"
+rootProject.name = "Gitpulpu"
 include(":ui")
 include(":app")
 include(":domain")

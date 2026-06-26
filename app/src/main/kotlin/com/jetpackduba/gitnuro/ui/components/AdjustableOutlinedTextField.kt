@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.onBackgroundSecondary
 import com.jetpackduba.gitnuro.theme.outlinedTextFieldColors
 
@@ -45,7 +46,7 @@ fun AdjustableOutlinedTextField(
         color = MaterialTheme.colors.onBackground,
     ),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = RoundedCornerShape(4.dp),
+    shape: Shape = AppShapes.small,
     backgroundColor: Color = MaterialTheme.colors.background,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -145,7 +146,7 @@ fun AdjustableOutlinedTextField(
         color = MaterialTheme.colors.onBackground,
     ),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = RoundedCornerShape(4.dp),
+    shape: Shape = AppShapes.small,
     backgroundColor: Color = MaterialTheme.colors.background,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     leadingIcon: @Composable (() -> Unit)? = null,

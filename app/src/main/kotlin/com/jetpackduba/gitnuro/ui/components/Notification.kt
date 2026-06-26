@@ -4,7 +4,6 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -20,6 +19,7 @@ import com.jetpackduba.gitnuro.app.generated.resources.warning
 import com.jetpackduba.gitnuro.domain.models.NotificationData
 import com.jetpackduba.gitnuro.domain.models.NotificationType
 import com.jetpackduba.gitnuro.domain.repositories.CompletedTask
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.AppTheme
 import org.jetbrains.compose.resources.painterResource
 
@@ -36,7 +36,7 @@ fun NotificationSuccessPreview() {
 
 @Composable
 fun Notification(data: NotificationData) {
-    val notificationShape = RoundedCornerShape(8.dp)
+    val notificationShape = AppShapes.medium
 
     Row(
         modifier = Modifier
@@ -69,7 +69,7 @@ fun Notification(data: NotificationData) {
 
         Box(
             modifier = Modifier
-                .clip(RoundedCornerShape(topStart = 6.dp, bottomStart = 6.dp))
+                .clip(AppShapes.medium)
                 .background(backgroundColor)
                 .fillMaxHeight()
         ) {

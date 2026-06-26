@@ -3,9 +3,14 @@
 package com.jetpackduba.gitnuro.ui
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -16,7 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -35,6 +44,7 @@ import com.jetpackduba.gitnuro.domain.models.PullType
 import com.jetpackduba.gitnuro.keybindings.Keybinding
 import com.jetpackduba.gitnuro.keybindings.KeybindingOption
 import com.jetpackduba.gitnuro.keybindings.keyBinding
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.notoSansMonoFontFamily
 import com.jetpackduba.gitnuro.theme.onBackgroundSecondary
 import com.jetpackduba.gitnuro.ui.components.PrimaryButton
@@ -62,8 +72,25 @@ fun Menu(
     val lastLoadedTabs by viewModel.lastLoadedTabs.collectAsState()
     val (position, setPosition) = remember { mutableStateOf<LayoutCoordinates?>(null) }
 
+    val surfaceColor = MaterialTheme.colors.surface
+    val bgColor = MaterialTheme.colors.background
+    val accentColor = MaterialTheme.colors.primary
+
     Row(
-        modifier = modifier,
+        modifier = modifier
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(surfaceColor, bgColor)
+                )
+            )
+            .drawBehind {
+                // Subtle warm bottom border line
+                drawRect(
+                    color = accentColor.copy(alpha = 0.08f),
+                    size = size.copy(height = 1.dp.toPx()),
+                    topLeft = androidx.compose.ui.geometry.Offset(0f, size.height - 1.dp.toPx()),
+                )
+            },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -221,7 +248,7 @@ fun Menu(
                     .width(600.dp)
                     .heightIn(max = 600.dp)
                     .background(MaterialTheme.colors.surface)
-                    .border(2.dp, MaterialTheme.colors.onBackground.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                    .border(2.dp, MaterialTheme.colors.onBackground.copy(alpha = 0.2f), AppShapes.large)
                     .padding(16.dp)
             ) {
                 PrimaryButton(
@@ -269,6 +296,27 @@ fun MenuButton(
     tooltipEnabled: Boolean = true,
     onClick: () -> Unit,
 ) {
+    val hoverInteraction = remember { MutableInteractionSource() }
+    val isHovered by hoverInteraction.collectIsHoveredAsState()
+
+    val bgColor by animateColorAsState(
+        targetValue = if (isHovered) {
+            MaterialTheme.colors.primary
+        } else {
+            MaterialTheme.colors.surface
+        },
+        animationSpec = spring()
+    )
+
+    val contentColor by animateColorAsState(
+        targetValue = if (isHovered) {
+            MaterialTheme.colors.onPrimary
+        } else {
+            MaterialTheme.colors.onBackground
+        },
+        animationSpec = spring()
+    )
+
     InstantTooltip(
         text = tooltip,
         enabled = tooltipEnabled,
@@ -281,8 +329,9 @@ fun MenuButton(
         Column(
             modifier = modifier
                 .ignoreKeyEvents()
-                .clip(RoundedCornerShape(4.dp))
-                .background(MaterialTheme.colors.surface)
+                .hoverable(hoverInteraction)
+                .clip(AppShapes.small)
+                .background(bgColor)
                 .handMouseClickable { if (enabled) onClick() }
                 .size(56.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -293,14 +342,14 @@ fun MenuButton(
                 contentDescription = title,
                 modifier = Modifier
                     .size(24.dp),
-                tint = MaterialTheme.colors.onBackground,
+                tint = contentColor,
             )
             Text(
                 text = title,
                 style = MaterialTheme.typography.caption,
                 maxLines = 1,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.onBackground,
+                color = contentColor,
             )
         }
     }
@@ -332,8 +381,8 @@ fun KeybindingHintPart(part: String) {
         fontWeight = FontWeight.Medium,
         color = MaterialTheme.colors.primary,
         modifier = Modifier
-            .clip(RoundedCornerShape(4.dp))
-            .border(2.dp, MaterialTheme.colors.primary, RoundedCornerShape(4.dp))
+            .clip(AppShapes.small)
+            .border(2.dp, MaterialTheme.colors.primary, AppShapes.small)
             .background(MaterialTheme.colors.primary.copy(alpha = 0.05f))
             .padding(horizontal = 4.dp, vertical = 4.dp)
 
@@ -406,12 +455,34 @@ fun ExtendedMenuButton(
     onClick: () -> Unit,
     extendedListItems: List<ContextMenuElement>,
 ) {
+    val hoverInteraction = remember { MutableInteractionSource() }
+    val isHovered by hoverInteraction.collectIsHoveredAsState()
+
+    val bgColor by animateColorAsState(
+        targetValue = if (isHovered) {
+            MaterialTheme.colors.primary
+        } else {
+            MaterialTheme.colors.surface
+        },
+        animationSpec = spring()
+    )
+
+    val contentColor by animateColorAsState(
+        targetValue = if (isHovered) {
+            MaterialTheme.colors.onPrimary
+        } else {
+            MaterialTheme.colors.onBackground
+        },
+        animationSpec = spring()
+    )
+
     Row(
         modifier = modifier
             .size(width = 64.dp, height = 56.dp)
             .ignoreKeyEvents()
-            .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colors.surface)
+            .hoverable(hoverInteraction)
+            .clip(AppShapes.small)
+            .background(bgColor)
             .handMouseClickable { if (enabled) onClick() }
     ) {
         InstantTooltip(
@@ -436,12 +507,12 @@ fun ExtendedMenuButton(
                     contentDescription = title,
                     modifier = Modifier
                         .size(24.dp),
-                    tint = MaterialTheme.colors.onBackground,
+                    tint = contentColor,
                 )
                 Text(
                     text = title,
                     style = MaterialTheme.typography.caption,
-                    color = MaterialTheme.colors.onBackground,
+                    color = contentColor,
                     maxLines = 1,
                 )
             }
@@ -460,7 +531,7 @@ fun ExtendedMenuButton(
                 Icon(
                     painterResource(Res.drawable.expand_more),
                     contentDescription = null,
-                    tint = MaterialTheme.colors.onBackground,
+                    tint = contentColor,
                     modifier = Modifier.size(16.dp)
                 )
 

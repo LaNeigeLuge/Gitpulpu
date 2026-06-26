@@ -32,6 +32,7 @@ import com.jetpackduba.gitnuro.domain.models.ui.Theme
 import com.jetpackduba.gitnuro.extensions.handMouseClickable
 import com.jetpackduba.gitnuro.extensions.handOnHover
 import com.jetpackduba.gitnuro.extensions.toSmartSystemString
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.backgroundSelected
 import com.jetpackduba.gitnuro.theme.onBackgroundSecondary
 import com.jetpackduba.gitnuro.theme.outlinedTextFieldColors
@@ -669,11 +670,13 @@ private fun Appearance(settingsViewState: SettingsViewState, onAction: (Settings
 
     SettingDropDown(
         title = "Avatar provider",
-        subtitle = "When using a provider, the e-mail addresses will be hashed using SHA256",
+        subtitle = "GitHub parses noreply emails for direct avatar access, with Gravatar fallback",
         currentOption = avatarProvider,
         dropDownOptions = listOf(
             DropDownOption(AvatarProviderType.None, "None"),
             DropDownOption(AvatarProviderType.Gravatar, "Gravatar"),
+            DropDownOption(AvatarProviderType.GitHub, "GitHub"),
+            DropDownOption(AvatarProviderType.GitLab, "GitLab"),
         ),
         onOptionSelected = {
             onAction(SettingsAction.SetConfig(AppConfig.AvatarProvider(it.value)))
@@ -720,9 +723,9 @@ fun <T> SettingDropDown(
                         .border(
                             width = 2.dp,
                             color = MaterialTheme.colors.onBackground.copy(alpha = 0.1F),
-                            shape = RoundedCornerShape(4.dp),
+                            shape = AppShapes.small,
                         )
-                        .clip(shape = RoundedCornerShape(4.dp))
+                        .clip(shape = AppShapes.small)
                         .background(MaterialTheme.colors.background)
                         .padding(vertical = 8.dp, horizontal = 12.dp)
                         .handOnHover(),

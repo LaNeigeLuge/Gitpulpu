@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.jetpackduba.gitnuro.extensions.backgroundIf
 import com.jetpackduba.gitnuro.app.generated.resources.*
 import com.jetpackduba.gitnuro.domain.models.ui.SelectedItem
+import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.backgroundSelected
 import com.jetpackduba.gitnuro.theme.onBackgroundSecondary
 import com.jetpackduba.gitnuro.ui.components.AdjustableOutlinedTextField
@@ -99,7 +100,7 @@ fun RebaseStateLoaded(
 
     Column(
         modifier = Modifier.fillMaxSize()
-            .clip(RoundedCornerShape(4.dp))
+            .clip(AppShapes.small)
             .background(MaterialTheme.colors.background)
     ) {
         Text(
@@ -251,7 +252,7 @@ fun ActionDropdown(
             .border(
                 width = 2.dp,
                 color = MaterialTheme.colors.onBackgroundSecondary.copy(alpha = 0.2f),
-                shape = RoundedCornerShape(4.dp),
+                shape = AppShapes.small,
             )
     ) {
         TextButton(

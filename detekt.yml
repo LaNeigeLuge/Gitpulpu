@@ -1,0 +1,66 @@
+build:
+  maxIssues: -1
+
+complexity:
+  LongParameterList:
+    ignoreAnnotated:
+      - "Composable"
+    functionThreshold: 10
+    constructorThreshold: 10
+  TooManyFunctions:
+    ignoreAnnotated:
+      - "Composable"
+    thresholdInFiles: 40
+    thresholdInClasses: 30
+  CyclomaticComplexMethod:
+    threshold: 20
+  LongMethod:
+    threshold: 80
+  LargeClass:
+    threshold: 800
+  NestedBlockDepth:
+    threshold: 6
+
+style:
+  MagicNumber:
+    active: false
+  ReturnCount:
+    max: 5
+  MaxLineLength:
+    maxLineLength: 140
+    excludeCommentStatements: true
+  WildcardImport:
+    active: false
+  UnusedPrivateMember:
+    ignoreAnnotated:
+      - "Composable"
+      - "Preview"
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated:
+      - "Composable"
+  TopLevelPropertyNaming:
+    constantPattern: "[A-Za-z][_A-Za-z0-9]*"
+
+formatting:
+  MaximumLineLength:
+    maxLineLength: 140
+  ImportOrdering:
+    active: false
+  NoWildcardImports:
+    active: false
+  Wrapping:
+    active: false
+  ArgumentListWrapping:
+    active: false
+  ParameterListWrapping:
+    active: false
+  FunctionSignature:
+    active: false
+  MultiLineIfElse:
+    active: false
+  TrailingCommaOnCallSite:
+    active: false
+  TrailingCommaOnDeclarationSite:
+    active: false

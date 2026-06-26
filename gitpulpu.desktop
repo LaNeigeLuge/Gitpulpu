@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Gitpulpu
+GenericName=Git Client
+Comment=Multiplatform Git client with a warm editorial UI
+Exec=gitpulpu %U
+Icon=gitpulpu
+Terminal=false
+Categories=Development;RevisionControl;
+Keywords=git;vcs;version;control;repository;
+MimeType=x-scheme-handler/gitpulpu;
+StartupWMClass=com-jetpackduba-gitnuro-MainKt

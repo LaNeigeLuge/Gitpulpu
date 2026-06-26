@@ -961,20 +961,22 @@ fun StateIcon(
     DelayedTooltip(tooltip) {
         Box(
             modifier = Modifier
-                .clip(RoundedCornerShape(4.dp))
+                .clip(AppShapes.small)
                 .run {
                     if (isToggled)
-                        this.background(MaterialTheme.colors.onSurface.copy(alpha = 0.2f))
+                        this
+                            .background(MaterialTheme.colors.primary.copy(alpha = 0.15f))
+                            .border(1.dp, MaterialTheme.colors.primary.copy(alpha = 0.4f), AppShapes.small)
                     else
                         this
                 }
-                .handMouseClickable { if (!isToggled) onClick() }
+                .handMouseClickable { onClick() }
                 .padding(4.dp)
         ) {
             Icon(
                 painterResource(icon),
                 contentDescription = null,
-                tint = MaterialTheme.colors.onSurface,
+                tint = if (isToggled) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
                 modifier = Modifier
                     .size(24.dp),
             )
@@ -1180,40 +1182,42 @@ fun DiffLineText(line: Line, diffType: DiffType, onActionTriggered: () -> Unit) 
 
     val text = line.text
     val matchLine = line.textDiffed
-    val hoverInteraction = remember { MutableInteractionSource() }
-    val isHovered by hoverInteraction.collectIsHoveredAsState()
 
-    Box(modifier = Modifier.hoverable(hoverInteraction)) {
-        if (
-            isHovered &&
-            diffType is DiffType.UncommittedDiff &&
+    val canStage = diffType is DiffType.UncommittedDiff &&
             line.lineType != LineType.CONTEXT &&
             diffType.statusType == StatusType.MODIFIED
-        ) {
-            val color: Color = if (diffType.entryType == EntryType.STAGED) {
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (canStage) {
+            @Suppress("USELESS_CAST")
+            val uncommittedDiff = diffType as DiffType.UncommittedDiff
+            val isStaged = uncommittedDiff.entryType == EntryType.STAGED
+            val color: Color = if (isStaged) {
                 MaterialTheme.colors.error
             } else {
                 MaterialTheme.colors.primary
             }
 
-            val iconName = remember(diffType) {
-                if (diffType.entryType == EntryType.STAGED) {
-                    Res.drawable.remove
-                } else {
-                    Res.drawable.add
-                }
+            val iconName = if (isStaged) {
+                Res.drawable.remove
+            } else {
+                Res.drawable.add
             }
 
-            Icon(
-                painterResource(iconName),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .clickable { onActionTriggered() }
-                    .size(16.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(color),
-            )
+            DisableSelection {
+                Icon(
+                    painterResource(iconName),
+                    contentDescription = if (isStaged) "Unstage line" else "Stage line",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .clickable { onActionTriggered() }
+                        .size(16.dp)
+                        .clip(AppShapes.small)
+                        .background(color),
+                )
+            }
         }
 
         DiffText(text, matchLine, syntaxHighlighter)
