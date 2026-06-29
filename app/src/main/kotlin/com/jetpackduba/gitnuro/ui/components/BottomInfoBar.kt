@@ -29,7 +29,7 @@ fun BottomInfoBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(32.dp)
-            .background(MaterialTheme.colors.surface)
+            .background(MaterialTheme.colors.background)
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

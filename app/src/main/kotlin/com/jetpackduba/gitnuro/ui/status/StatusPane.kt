@@ -463,7 +463,7 @@ fun ColumnScope.ChangesList(
         ScrollableLazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colors.background),
+                .background(MaterialTheme.colors.surface),
             state = listState,
         ) {
             this.content()

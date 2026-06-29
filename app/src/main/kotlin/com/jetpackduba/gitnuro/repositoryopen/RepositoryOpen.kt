@@ -111,7 +111,11 @@ fun RepositoryOpenPage(
         CompositionLocalProvider(
             LocalTabFocusRequester provides focusRequester
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .background(MaterialTheme.colors.background)
+            ) {
                 Menu(
                     viewModel = repositoryOpenViewModel,
                     modifier = Modifier

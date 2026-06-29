@@ -136,7 +136,7 @@ fun WelcomeView(
             .fillMaxSize()
             .focusable(true)
             .focusRequester(welcomeViewFocusRequester)
-            .background(MaterialTheme.colors.surface)
+            .background(MaterialTheme.colors.background)
             .onPreviewKeyEvent {
                 when {
                     it.matchesBinding(KeybindingOption.OPEN_REPOSITORY) -> {

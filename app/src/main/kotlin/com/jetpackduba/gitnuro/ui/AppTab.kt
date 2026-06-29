@@ -118,7 +118,7 @@ fun AppTab(
     Box {
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colors.surface)
+                .background(MaterialTheme.colors.background)
                 .fillMaxSize()
         ) {
 

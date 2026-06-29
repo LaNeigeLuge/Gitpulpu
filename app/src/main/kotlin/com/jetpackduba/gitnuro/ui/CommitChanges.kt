@@ -132,7 +132,7 @@ private fun CommitChangesView(
                 .padding(bottom = 4.dp)
                 .fillMaxWidth()
                 .weight(1f, fill = true)
-                .background(MaterialTheme.colors.background)
+                .background(MaterialTheme.colors.surface)
         ) {
             FilesChangedHeader(
                 title = "Files changed",

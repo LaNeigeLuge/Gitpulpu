@@ -117,7 +117,7 @@ fun DiffPane(
 
     Column(
         modifier = Modifier
-            .background(MaterialTheme.colors.background)
+            .background(MaterialTheme.colors.surface)
             .fillMaxSize()
             .focusable(true)
             .focusRequester(focusRequester)

@@ -216,7 +216,7 @@ private fun LogView(
 
     Column(
         modifier = Modifier
-            .background(MaterialTheme.colors.background)
+            .background(MaterialTheme.colors.surface)
             .fillMaxSize()
     ) {
         var graphWidth = (CANVAS_DEFAULT_WIDTH + graphPadding).dp
@@ -854,7 +854,7 @@ private fun CommitLine(
                 modifier = Modifier
                     .padding(start = graphWidth)
                     .fillMaxHeight()
-                    .background(MaterialTheme.colors.background)
+                    .background(MaterialTheme.colors.surface)
                     .backgroundIf(isSelected, MaterialTheme.colors.backgroundSelected)
             ) {
                 // Branch color accent strip — solid color, Caldera style: shout or stay silent
