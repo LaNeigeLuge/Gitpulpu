@@ -27,6 +27,7 @@ import com.jetpackduba.gitnuro.domain.models.ui.SelectedItem
 import com.jetpackduba.gitnuro.extensions.handMouseClickable
 import com.jetpackduba.gitnuro.keybindings.KeybindingOption
 import com.jetpackduba.gitnuro.keybindings.matchesBinding
+import com.jetpackduba.gitnuro.theme.backgroundGradientEnd
 import com.jetpackduba.gitnuro.ui.*
 import com.jetpackduba.gitnuro.ui.components.BottomInfoBar
 import com.jetpackduba.gitnuro.ui.components.TripleVerticalSplitPanel
@@ -114,7 +115,14 @@ fun RepositoryOpenPage(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .background(MaterialTheme.colors.background)
+                    .background(
+                        Brush.linearGradient(
+                            colors = listOf(
+                                MaterialTheme.colors.background,
+                                MaterialTheme.colors.backgroundGradientEnd,
+                            ),
+                        )
+                    )
             ) {
                 Menu(
                     viewModel = repositoryOpenViewModel,

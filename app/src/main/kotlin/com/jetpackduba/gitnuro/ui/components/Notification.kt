@@ -13,14 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.jetpackduba.gitnuro.app.generated.resources.Res
+import com.jetpackduba.gitnuro.app.generated.resources.done
 import com.jetpackduba.gitnuro.app.generated.resources.error
-import com.jetpackduba.gitnuro.app.generated.resources.info
 import com.jetpackduba.gitnuro.app.generated.resources.warning
 import com.jetpackduba.gitnuro.domain.models.NotificationData
 import com.jetpackduba.gitnuro.domain.models.NotificationType
 import com.jetpackduba.gitnuro.domain.repositories.CompletedTask
 import com.jetpackduba.gitnuro.theme.AppShapes
 import com.jetpackduba.gitnuro.theme.AppTheme
+import com.jetpackduba.gitnuro.theme.addFile
 import org.jetbrains.compose.resources.painterResource
 
 
@@ -51,7 +52,7 @@ fun Notification(data: NotificationData) {
     ) {
         val backgroundColor = when (data.type) {
             NotificationType.Warning -> MaterialTheme.colors.secondary
-            NotificationType.Positive -> MaterialTheme.colors.primary
+            NotificationType.Positive -> MaterialTheme.colors.addFile
             NotificationType.Error -> MaterialTheme.colors.error
         }
 
@@ -63,7 +64,7 @@ fun Notification(data: NotificationData) {
 
         val icon = when (data.type) {
             NotificationType.Warning -> Res.drawable.warning
-            NotificationType.Positive -> Res.drawable.info
+            NotificationType.Positive -> Res.drawable.done
             NotificationType.Error -> Res.drawable.error
         }
 

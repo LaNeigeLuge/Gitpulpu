@@ -90,6 +90,10 @@ val Colors.backgroundSelected: Color
     @Composable
     get() = theme.backgroundSelected
 
+val Colors.backgroundGradientEnd: Color
+    @Composable
+    get() = theme.backgroundGradientEnd
+
 val Colors.onBackgroundSecondary: Color
     @Composable
     get() = theme.onBackgroundSecondary

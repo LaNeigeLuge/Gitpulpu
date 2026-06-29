@@ -6,7 +6,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
+import com.jetpackduba.gitnuro.theme.backgroundGradientEnd
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
@@ -118,7 +120,14 @@ fun AppTab(
     Box {
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colors.background)
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(
+                            MaterialTheme.colors.background,
+                            MaterialTheme.colors.backgroundGradientEnd,
+                        ),
+                    )
+                )
                 .fillMaxSize()
         ) {
 

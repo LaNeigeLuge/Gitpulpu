@@ -14,6 +14,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
@@ -51,7 +52,7 @@ fun TripleVerticalSplitPanel(
 
     Row(
         modifier = modifier
-            .padding(start = 6.dp, end = 6.dp, top = 4.dp, bottom = 4.dp)
+            .padding(start = 8.dp, end = 8.dp, top = 6.dp, bottom = 6.dp)
             .onSizeChanged {
                 updateMaxPaneWidthToComponentWidth(it.width)
             }
@@ -61,6 +62,7 @@ fun TripleVerticalSplitPanel(
                 modifier = Modifier
                     .width(firstWidth.dp)
                     .fillMaxHeight()
+                    .shadow(6.dp, AppShapes.medium)
                     .clip(AppShapes.medium)
                     .background(MaterialTheme.colors.surface)
             ) {
@@ -69,7 +71,7 @@ fun TripleVerticalSplitPanel(
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .width(8.dp)
+                    .width(12.dp)
                     .draggable(
                         state = rememberDraggableState {
                             onFirstSizeChange(it)
@@ -90,6 +92,7 @@ fun TripleVerticalSplitPanel(
             Modifier
                 .weight(1f, true)
                 .fillMaxHeight()
+                .shadow(6.dp, AppShapes.medium)
                 .clip(AppShapes.medium)
                 .background(MaterialTheme.colors.surface)
         ) {
@@ -99,7 +102,7 @@ fun TripleVerticalSplitPanel(
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .width(8.dp)
+                .width(12.dp)
                 .draggable(
                     state = rememberDraggableState {
                         onThirdSizeChange(it)
@@ -119,6 +122,7 @@ fun TripleVerticalSplitPanel(
             modifier = Modifier
                 .width(thirdWidth.dp)
                 .fillMaxHeight()
+                .shadow(6.dp, AppShapes.medium)
                 .clip(AppShapes.medium)
                 .background(MaterialTheme.colors.surface)
         ) {

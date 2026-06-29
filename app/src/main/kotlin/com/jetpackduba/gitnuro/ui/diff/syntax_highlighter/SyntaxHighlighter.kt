@@ -20,7 +20,7 @@ private data class Token(val word: String, val start: Int)
  * Matches identifiers, numbers, operators, and individual punctuation.
  * Preserves positions so syntax spans map correctly to the source string.
  */
-private val TOKEN_PATTERN = Regex("""[a-zA-Z_]\w*|0[xXbBoO][\da-fA-F_]+|\d[\d_.]*\w*|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|//.*|#.*|/\*.*?\*/|[^\s]""")
+private val TOKEN_PATTERN = Regex("""[a-zA-Z_]\w*|0[xXbBoO][\da-fA-F_]+|\d[\d_.]*\w*|"[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*'|//.*|#.*|/\*.*?\*/|[^\s]""")
 
 abstract class SyntaxHighlighter {
     private val keywords: List<String> by lazy {
@@ -37,7 +37,11 @@ abstract class SyntaxHighlighter {
      * "if(x)" → [Token("if",0), Token("(",2), Token("x",3), Token(")",4)]
      */
     private fun tokenize(text: String): List<Token> {
-        return TOKEN_PATTERN.findAll(text).map { Token(it.value, it.range.first) }.toList()
+        return try {
+            TOKEN_PATTERN.findAll(text).map { Token(it.value, it.range.first) }.toList()
+        } catch (_: StackOverflowError) {
+            emptyList()
+        }
     }
 
     fun syntaxHighlight(

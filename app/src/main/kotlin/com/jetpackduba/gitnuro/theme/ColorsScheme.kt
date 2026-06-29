@@ -44,6 +44,7 @@ data class ColorsScheme(
     val diffKeyword: Color,
     val diffAnnotation: Color,
     val diffComment: Color,
+    val backgroundGradientEnd: Color,
     val isLight: Boolean,
 ) {
     fun toComposeColors(): Colors {
