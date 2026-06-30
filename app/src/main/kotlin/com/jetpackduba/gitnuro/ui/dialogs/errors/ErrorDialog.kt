@@ -20,6 +20,7 @@ import com.jetpackduba.gitnuro.app.generated.resources.copy
 import com.jetpackduba.gitnuro.app.generated.resources.error
 import com.jetpackduba.gitnuro.app.generated.resources.error_dialog_copy_button_tooltip
 import com.jetpackduba.gitnuro.app.generated.resources.generic_button_ok
+import com.jetpackduba.gitnuro.app.generated.resources.info
 import com.jetpackduba.gitnuro.domain.errors.GenericError
 import com.jetpackduba.gitnuro.domain.models.TaskType
 import com.jetpackduba.gitnuro.domain.repositories.CompletedTask
@@ -57,52 +58,102 @@ fun ErrorDialog(
             modifier = Modifier
                 .width(580.dp)
         ) {
-            Row {
-                Text(
-                    text = error.taskType.errorTitle(),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colors.onBackground,
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Icon(
-                    painterResource(Res.drawable.error),
-                    contentDescription = null,
-                    tint = MaterialTheme.colors.error,
-                    modifier = Modifier.size(24.dp)
-                        .onDoubleClick {
-                            showStackTrace = !showStackTrace
-                        }
-                )
-            }
-
             if (friendlyMessage != null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painterResource(Res.drawable.info),
+                        contentDescription = null,
+                        tint = MaterialTheme.colors.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = error.taskType.guidanceTitle(),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colors.onBackground,
+                    )
+                }
+
                 Text(
                     text = friendlyMessage.first,
                     color = MaterialTheme.colors.onBackground,
                     modifier = Modifier.padding(top = 16.dp),
                     style = MaterialTheme.typography.body2,
                 )
-                Text(
-                    text = friendlyMessage.second,
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.body2,
-                    fontWeight = FontWeight.Medium,
-                )
-            }
 
-            SelectionContainer {
-                Text(
-                    text = error.reason.toString(),
-                    color = if (friendlyMessage != null) MaterialTheme.colors.onBackground.copy(alpha = 0.5f) else MaterialTheme.colors.onBackground,
+                Row(
                     modifier = Modifier
-                        .padding(top = if (friendlyMessage != null) 12.dp else 16.dp)
-                        .widthIn(max = 600.dp),
-                    style = MaterialTheme.typography.body2,
+                        .padding(top = 12.dp)
+                        .background(
+                            MaterialTheme.colors.primary.copy(alpha = 0.08f),
+                            shape = MaterialTheme.shapes.small,
+                        )
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    Text(
+                        text = friendlyMessage.second,
+                        color = MaterialTheme.colors.primary,
+                        style = MaterialTheme.typography.body2,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+
+                var showDetails by remember { mutableStateOf(false) }
+                Text(
+                    text = if (showDetails) "Hide details" else "Show details",
+                    color = MaterialTheme.colors.onBackground.copy(alpha = 0.4f),
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .handOnHover()
+                        .clickable { showDetails = !showDetails },
+                    style = MaterialTheme.typography.caption,
                 )
+                if (showDetails) {
+                    SelectionContainer {
+                        Text(
+                            text = error.reason.toString(),
+                            color = MaterialTheme.colors.onBackground.copy(alpha = 0.4f),
+                            modifier = Modifier
+                                .padding(top = 4.dp)
+                                .widthIn(max = 600.dp),
+                            style = MaterialTheme.typography.caption,
+                        )
+                    }
+                }
+            } else {
+                Row {
+                    Text(
+                        text = error.taskType.errorTitle(),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colors.onBackground,
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Icon(
+                        painterResource(Res.drawable.error),
+                        contentDescription = null,
+                        tint = MaterialTheme.colors.error,
+                        modifier = Modifier.size(24.dp)
+                            .onDoubleClick {
+                                showStackTrace = !showStackTrace
+                            }
+                    )
+                }
+
+                SelectionContainer {
+                    Text(
+                        text = error.reason.toString(),
+                        color = MaterialTheme.colors.onBackground,
+                        modifier = Modifier
+                            .padding(top = 16.dp)
+                            .widthIn(max = 600.dp),
+                        style = MaterialTheme.typography.body2,
+                    )
+                }
             }
 
             if (showStackTrace && errorStackTrace != null) {
@@ -179,6 +230,18 @@ fun ErrorDialog(
 
 fun copyMessageError(clipboard: ClipboardManager, ex: Exception) {
     clipboard.setText(AnnotatedString(ex.stackTraceToString()))
+}
+
+fun TaskType.guidanceTitle(): String {
+    return when (this) {
+        TaskType.CheckoutCommit, TaskType.CheckoutBranch, TaskType.CheckoutRemoteBranch, TaskType.CheckoutTag ->
+            "Action needed"
+        TaskType.MergeBranch -> "Merge needs attention"
+        TaskType.RebaseBranch, TaskType.RebaseInteractive, TaskType.ContinueRebase -> "Rebase needs attention"
+        TaskType.Pull, TaskType.PullFromBranch -> "Pull needs attention"
+        TaskType.Push, TaskType.PushToBranch -> "Push needs attention"
+        else -> "Action needed"
+    }
 }
 
 @Suppress("CyclomaticComplexMethod")
@@ -289,6 +352,14 @@ private fun friendlyErrorMessage(error: CompletedTask.Failure): Pair<String, Str
         message.contains("detached HEAD") ->
             "You are in detached HEAD state — not on any branch." to
                 "Fix: Create a new branch from the current state with 'git checkout -b branch-name'."
+
+        message.contains("already exists", ignoreCase = true) ->
+            "A local branch with this name already exists." to
+                "You can check out the existing local branch instead, or delete it first if you want to recreate it from the remote."
+
+        message.contains("is not allowed", ignoreCase = true) || message.contains("InvalidRefName", ignoreCase = true) ->
+            "This branch name contains characters or patterns that git doesn't allow." to
+                "Avoid spaces, consecutive dots (..), tilde (~), caret (^), colon (:), and names ending with .lock. Rename the branch and try again."
 
         else -> null
     }
