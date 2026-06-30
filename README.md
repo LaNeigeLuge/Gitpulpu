@@ -1,178 +1,123 @@
-# Gitnuro - Multiplatform Git Client
+# Gitpulpu
 
-[![Latest release](https://img.shields.io/github/v/release/JetpackDuba/Gitnuro?color=blue&label=latest%20release)](https://github.com/JetpackDuba/Gitnuro/releases/latest)
+A multiplatform Git client built with Jetpack Compose Desktop and JGit.
+Fork of [Gitnuro](https://github.com/JetpackDuba/Gitnuro) with a redesigned UI, smarter error handling, and quality-of-life improvements.
 
-![Icon](res/img/cover.png)
+![Gitpulpu](icons/gitpulpu%20look.png)
 
-A FOSS Git client based on (Jetbrains) Compose and JGit.
+## What's different from Gitnuro
 
-The main goal of Gitnuro is to provide a multiplatform open source Git client without any kind of constraint to how you
-can use it nor relying on web technologies.
+- **Caldera-inspired theme** — warm dark mode with glow-line graph, concrete light mode with gradient background and floating parchment cards
+- **Auto-stash checkout** — switching branches with uncommitted changes automatically stashes, checks out, and pops. No more conflict dialogs for simple branch switches
+- **Friendly error messages** — known errors (merge conflicts, auth failures, ref collisions) show actionable guidance instead of raw stack traces
+- **Syntax highlighting fix** — resolved a crash (StackOverflowError) when viewing `.tfvars` and other files with long strings
 
-## Download/Install
+## Install
 
-Linux:
+**Linux:**
 
-- Available as Flatpak [here](https://flathub.org/apps/details/com.jetpackduba.Gitnuro) or by
-  running `flatpak install com.jetpackduba.Gitnuro` if you have Flatpak & Flathub already setup.
-    - If Flathub is not set up, you can add the source with the following
-      command `flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo`.
-- JAR file can be executed as a portable version (Requires JRE 17).
+```bash
+# From source
+git clone https://github.com/jujuroro93/Gitpulpu.git
+cd Gitpulpu
+./gradlew run
+```
 
-Windows:
+**Windows / macOS:**
 
-- [Installable & portable version](https://github.com/JetpackDuba/Gitnuro/releases/latest).
+```bash
+git clone https://github.com/jujuroro93/Gitpulpu.git
+cd Gitpulpu
+./gradlew packageDistributionForCurrentOS
+```
 
-MacOS:
+Requires **JDK 17+**.
 
-- [ZIP which contains the app bundle](https://github.com/JetpackDuba/Gitnuro/releases/latest).
-- Using hombrew: `brew install jetpackduba/apps/gitnuro`
+## Build
+
+```bash
+# Run in dev mode
+./gradlew run
+
+# Package for distribution
+./gradlew packageDistributionForCurrentOS
+
+# Build JAR (portable, requires JRE 17)
+./gradlew packageUberJarForCurrentOS
+```
 
 ## Features
 
-Gitnuro has support for the following features:
+Everything from Gitnuro, plus the improvements above:
 
-- View diffs for text based files.
-- View your history log and all its branches.
-- Add (stage) & reset (unstage) files.
-- Stage & unstage of hunks.
-- Checkout files (revert changes of uncommitted files).
-- Clone.
-- Commit.
-- Reset commits.
-- Revert commits.
-- Amend previous commit.
-- Merge.
-- Rebase.
-- Create and delete branches locally.
-- Create and delete tags locally.
-- View remote branches.
-- Pull and push.
-- Stash and pop stash.
-- Checkout a commit (detached HEAD).
-- View changes/diff in images (side to side comparison).
-- Force push.
-- Remove branches from remote.
-- Manage remotes.
-- Start a new local repository.
-- Search by commit message/author/commit id.
-- Rebase interactive.
-- Blame file.
-- View file history.
-- Theming.
-- Side by side diff in text files.
-- Stage/Unstage specific lines.
-- Submodules support.
-- Change the tracking of a specific branch.
+- View diffs for text-based files with syntax highlighting
+- Full commit history with branch graph
+- Stage, unstage, and discard changes (files, hunks, or individual lines)
+- Commit, amend, revert, cherry-pick, reset
+- Branch management (create, delete, rename, checkout)
+- Merge and rebase (including interactive rebase)
+- Pull, push, force push, fetch
+- Stash and pop stash
+- Tag management
+- Remote management
+- Clone repositories
+- Submodule support
+- File blame and file history
+- Side-by-side diff view
+- Image diff (side-by-side comparison)
+- Search by commit message, author, or commit ID
+- Custom JSON themes
 
-<details>
-  <summary><b>Features planned</b></summary>
+## Custom themes
 
-- Create/Apply patches
-- Remove tags from remote.
-- View stashes in the log tree.
-- Syntax highlighting for diff.
-- Various log options like showing the author, filtering by current branch o hide remote branches.
-- Customizations settings.
+Gitpulpu supports custom themes in JSON format via Settings. Example:
 
-</details>
-
-## Contributing
-
-If you find a bug or you would like to suggest a new feature, feel free to open an issue.
-
-Pull requests are also welcome but please create an issue first if it's a new feature. If you want to work on an
-existing issue, please comment so I'm aware of it and discuss the changes if required.
-See [this page](DEVELOPMENT.md) for how to set up your development environment.
-
-## FAQ
-
-> Is Gitnuro completly free?
-
-Yes, free in both meanings of the word (in money and freedom).
-
-> Does Gitnuro keep track of my data?
-
-Gitnuro does not track data in any way, don't worry.
-
-> I don't like the built-in themes, can I create a custom one?
-
-Gitnuro includes the option to set custom themes in a JSON format. Keep in mind that themes may break with new releases,
-making the default theme the fallback option.
-
-For the latest stable version, you can use this JSON as an example:
-
-```
+```json
 {
-    "primary": "FF456b00",
-    "primaryVariant": "FF456b00",
-    "onPrimary": "FFFFFFFFF",
-    "secondary": "FF9c27b0",
-    "onBackground": "FF141f00",
-    "onBackgroundSecondary": "FF595858",
-    "error": "FFc93838",
-    "onError": "FFFFFFFF",
-    "background": "FFe7f2d3",
-    "backgroundSelected": "C0cee1f2",
-    "surface": "FFc5f078",
-    "secondarySurface": "FFedeef2",
-    "tertiarySurface": "FFF4F6FA",
-    "addFile": "FF32A852",
-    "deletedFile": "FFc93838",
-    "modifiedFile": "FF0070D8",
-    "conflictingFile": "FFFFB638",
-    "dialogOverlay": "AA000000",
-    "normalScrollbar": "FFCCCCCC",
-    "hoverScrollbar": "FF0070D8",
-    "diffLineAdded": "FF0070D8",
-    "diffLineRemoved": "FF0070D8",
-    "onSecondary": "FF000000",
-    "diffContentAdded": "FF000000",
-    "diffContentRemoved": "FF000000",
-    "diffKeyword": "FF000000", 
-    "diffAnnotation": "FF000000",
-    "diffComment": "FF000000",
-    "isLight": true
+  "primary": "FFFC5000",
+  "primaryVariant": "FFFF8A50",
+  "onPrimary": "FFFFFFFF",
+  "secondary": "FF7B74FF",
+  "onSecondary": "FFFFFFFF",
+  "onBackground": "FFF0EFEB",
+  "onBackgroundSecondary": "FFB0AEA8",
+  "error": "FFD03030",
+  "onError": "FFFFFFFF",
+  "background": "FF121214",
+  "backgroundSelected": "FF3D2C15",
+  "surface": "FF1C1C20",
+  "secondarySurface": "FF262630",
+  "tertiarySurface": "FF2E2822",
+  "addFile": "FF2E8C48",
+  "deletedFile": "FFD03030",
+  "modifiedFile": "FFFC5000",
+  "conflictingFile": "FFD88020",
+  "dialogOverlay": "AA000000",
+  "normalScrollbar": "FF555550",
+  "hoverScrollbar": "FFFC5000",
+  "diffLineAdded": "AA3A5038",
+  "diffLineRemoved": "AA5A3838",
+  "diffContentAdded": "4530A030",
+  "diffContentRemoved": "45C03030",
+  "diffKeyword": "FFA0CAF0",
+  "diffAnnotation": "FFD0CC60",
+  "diffComment": "FF70C290",
+  "isLight": false
 }
 ```
 
-Colors are in ARGB Hex format.
+Colors are in ARGB hex format.
 
-> Why isn't the Mac version signed?
+## Contributing
 
-The cost of the Apple Developer Program is quite high with a platform that currently has very few users. I may pay for
-it if it's a very requested feature but not for now.
+Issues and pull requests are welcome. For new features, please open an issue first to discuss the approach.
 
-> Authentication has failed. What's wrong?
+See [DEVELOPMENT.md](DEVELOPMENT.md) for development setup.
 
-Currently there are some limitations regarding this topic. Here are some known problematic setups:
+## Credits
 
-- Multicast DNS remote URL (https://github.com/JetpackDuba/Gitnuro/issues/19) with this
-  workaround (https://github.com/JetpackDuba/Gitnuro/issues/19#issuecomment-1374431720).
-- Self signed server certificate (https://github.com/JetpackDuba/Gitnuro/issues/48)
+Built on [Gitnuro](https://github.com/JetpackDuba/Gitnuro) by JetpackDuba.
 
-If the authentication fails and you think its due to a different reason, please open a new issue.
+## License
 
-
-> Does it support Git credentials manager (aka manager-core)?
-
-Yes, but it requires specifying the full path of the binary in your `.gitconfig`.
-
-Example for linux:
-
-```
-[credential]
-   helper = /usr/share/git-credential-manager-core/git-credential-manager-core
-```
-
-Example for windows (you may want to edit `C:\Program Files\Git\etc\gitconfig`):
-
-```
-[credential]
-   helper = C:/Program Files/Git/mingw64/bin/git-credential-manager-core.exe
-```
-
-## Sponsors
-
-Thank you to all the sponsors for helping improve Gitnuro and JetBrains for providing the necessary tooling.
-
+Licensed under the same terms as the original Gitnuro project.
