@@ -548,6 +548,19 @@ private fun CommitField(
                 onAmendChecked = onAmendRebaseInteractiveChecked,
             )
 
+            // Repository is mid-rebase but the app lost track of it (e.g. after a restart or
+            // an error during checkout) — still offer Abort/Continue/Skip so the user isn't stuck.
+            repositoryState.isRebasing -> RebasingButtons(
+                canContinue = !hasUnstagedFiles,
+                haveConflictsBeenSolved = !hasUnstagedFiles,
+                onAbort = onAbortRebase,
+                onContinue = onContinueRebase,
+                onSkip = onSkipRebase,
+                isAmendable = false,
+                isAmend = false,
+                onAmendChecked = {},
+            )
+
             repositoryState.isCherryPicking -> CherryPickingButtons(
                 haveConflictsBeenSolved = !hasUnstagedFiles,
                 onAbort = onResetRepoState,

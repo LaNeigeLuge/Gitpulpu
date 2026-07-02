@@ -19,15 +19,24 @@ import com.jetpackduba.gitnuro.app.generated.resources.Res
 import com.jetpackduba.gitnuro.app.generated.resources.copy
 import com.jetpackduba.gitnuro.app.generated.resources.error
 import com.jetpackduba.gitnuro.app.generated.resources.error_dialog_copy_button_tooltip
+import com.jetpackduba.gitnuro.app.generated.resources.generic_button_cancel
 import com.jetpackduba.gitnuro.app.generated.resources.generic_button_ok
 import com.jetpackduba.gitnuro.app.generated.resources.info
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import com.jetpackduba.gitnuro.domain.errors.GenericError
+import com.jetpackduba.gitnuro.domain.extensions.isCherryPicking
+import com.jetpackduba.gitnuro.domain.extensions.isMerging
+import com.jetpackduba.gitnuro.domain.extensions.isReverting
 import com.jetpackduba.gitnuro.domain.models.TaskType
 import com.jetpackduba.gitnuro.domain.repositories.CompletedTask
+import com.jetpackduba.gitnuro.theme.AppShapes
+import com.jetpackduba.gitnuro.theme.conflictFile
 import com.jetpackduba.gitnuro.theme.secondarySurface
 import com.jetpackduba.gitnuro.ui.components.PrimaryButton
 import com.jetpackduba.gitnuro.ui.components.tooltip.InstantTooltip
 import com.jetpackduba.gitnuro.ui.dialogs.base.MaterialDialog
+import org.eclipse.jgit.lib.RepositoryState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -36,6 +45,11 @@ import org.jetbrains.compose.resources.stringResource
 fun ErrorDialog(
     error: CompletedTask.Failure,
     onAccept: () -> Unit,
+    repositoryState: RepositoryState? = null,
+    currentBranchName: String? = null,
+    onAbortOperation: (() -> Unit)? = null,
+    onContinueOperation: (() -> Unit)? = null,
+    onForcePush: (() -> Unit)? = null,
 ) {
     val horizontalScroll = rememberScrollState()
     val verticalScroll = rememberScrollState()
@@ -156,6 +170,19 @@ fun ErrorDialog(
                 }
             }
 
+            if (
+                repositoryState != null &&
+                repositoryState != RepositoryState.SAFE &&
+                repositoryState != RepositoryState.BARE
+            ) {
+                CurrentOperationStatus(
+                    repositoryState = repositoryState,
+                    currentBranchName = currentBranchName,
+                    onAbort = onAbortOperation?.let { abort -> { abort(); onAccept() } },
+                    onContinue = onContinueOperation?.let { cont -> { cont(); onAccept() } },
+                )
+            }
+
             if (showStackTrace && errorStackTrace != null) {
                 Box(
                     modifier = Modifier
@@ -217,11 +244,94 @@ fun ErrorDialog(
             Row(
                 modifier = Modifier
                     .align(Alignment.End)
-                    .padding(top = 32.dp)
+                    .padding(top = 32.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
+                if (onForcePush != null) {
+                    PrimaryButton(
+                        text = "Force push",
+                        onClick = {
+                            onForcePush()
+                            onAccept()
+                        },
+                        backgroundColor = MaterialTheme.colors.error,
+                        textColor = MaterialTheme.colors.onError,
+                        modifier = Modifier.padding(end = 8.dp),
+                    )
+                }
+
                 PrimaryButton(
-                    text = stringResource(Res.string.generic_button_ok),
-                    onClick = onAccept
+                    text = if (onForcePush != null) stringResource(Res.string.generic_button_cancel)
+                    else stringResource(Res.string.generic_button_ok),
+                    onClick = onAccept,
+                    backgroundColor = if (onForcePush != null) Color.Transparent else MaterialTheme.colors.primary,
+                    textColor = if (onForcePush != null) MaterialTheme.colors.onBackground
+                    else MaterialTheme.colors.onPrimary,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Live status of the operation currently blocking the repository (rebase, merge,
+ * cherry-pick, revert) with direct Abort / Continue actions, so the user can resolve
+ * the situation from the error popup itself instead of hunting through menus.
+ */
+@Composable
+private fun CurrentOperationStatus(
+    repositoryState: RepositoryState,
+    currentBranchName: String?,
+    onAbort: (() -> Unit)?,
+    onContinue: (() -> Unit)?,
+) {
+    val operationName = when {
+        repositoryState.isRebasing -> "Rebase"
+        repositoryState.isMerging -> "Merge"
+        repositoryState.isCherryPicking -> "Cherry-pick"
+        repositoryState.isReverting -> "Revert"
+        else -> "Operation (${repositoryState.description})"
+    }
+
+    // During a rebase HEAD is detached, so the branch name is usually unavailable
+    val branchText = currentBranchName?.let { "on branch '$it'" }
+        ?: "(HEAD is detached while the operation is in progress)"
+
+    val accent = MaterialTheme.colors.conflictFile
+
+    Column(
+        modifier = Modifier
+            .padding(top = 16.dp)
+            .fillMaxWidth()
+            .clip(AppShapes.small)
+            .background(accent.copy(alpha = 0.12f))
+            .padding(12.dp),
+    ) {
+        Text(
+            text = "Happening right now: $operationName in progress $branchText",
+            color = MaterialTheme.colors.onBackground,
+            style = MaterialTheme.typography.body2,
+            fontWeight = FontWeight.SemiBold,
+        )
+
+        Row(
+            modifier = Modifier.padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (onAbort != null) {
+                PrimaryButton(
+                    text = "Abort $operationName".lowercase().replaceFirstChar { it.uppercase() },
+                    onClick = onAbort,
+                    backgroundColor = MaterialTheme.colors.error,
+                    textColor = MaterialTheme.colors.onError,
+                )
+            }
+
+            if (onContinue != null && repositoryState.isRebasing) {
+                PrimaryButton(
+                    text = "Continue rebase",
+                    onClick = onContinue,
+                    modifier = Modifier.padding(start = 8.dp),
                 )
             }
         }
@@ -360,6 +470,17 @@ private fun friendlyErrorMessage(error: CompletedTask.Failure): Pair<String, Str
         message.contains("is not allowed", ignoreCase = true) || message.contains("InvalidRefName", ignoreCase = true) ->
             "This branch name contains characters or patterns that git doesn't allow." to
                 "Avoid spaces, consecutive dots (..), tilde (~), caret (^), colon (:), and names ending with .lock. Rename the branch and try again."
+
+        message.contains("Wrong Repository State", ignoreCase = true) ->
+            "A rebase or merge is already in progress." to
+                "Use the banner at the top to Continue, Skip, or Abort it — or Actions → Reset repository state."
+
+        message.contains("rejected", ignoreCase = true) &&
+            (message.contains("non-fast-forward", ignoreCase = true) ||
+                message.contains("do not have locally", ignoreCase = true) ||
+                message.contains("remote contains work", ignoreCase = true)) ->
+            "The remote branch has commits your local branch doesn't — usually because you rebased or amended." to
+                "Force push to overwrite the remote with your local history, or Pull first if you want to keep the remote commits. Force push is safe for your own feature branches, risky on shared ones."
 
         else -> null
     }

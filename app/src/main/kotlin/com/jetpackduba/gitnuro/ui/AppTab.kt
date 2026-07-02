@@ -23,11 +23,15 @@ import com.jetpackduba.gitnuro.app.generated.resources.lfs
 import com.jetpackduba.gitnuro.domain.credentials.CredentialsRequest
 import com.jetpackduba.gitnuro.domain.models.NotificationData
 import com.jetpackduba.gitnuro.domain.models.NotificationType
+import com.jetpackduba.gitnuro.domain.errors.GenericError
 import com.jetpackduba.gitnuro.domain.models.RepositorySelectionState
+import com.jetpackduba.gitnuro.domain.models.TaskType
 import com.jetpackduba.gitnuro.domain.models.successTitle
 import com.jetpackduba.gitnuro.domain.repositories.CompletedTask
 import com.jetpackduba.gitnuro.repositoryopen.RepositoryOpenPage
+import com.jetpackduba.gitnuro.repositoryopen.RepositoryOpenViewModel
 import com.jetpackduba.gitnuro.tabViewModel
+import com.jetpackduba.gitnuro.ui.status.StatusAction
 import com.jetpackduba.gitnuro.theme.dialogOverlay
 import com.jetpackduba.gitnuro.ui.components.Notification
 import com.jetpackduba.gitnuro.ui.dialogs.*
@@ -217,12 +221,47 @@ fun AppTab(
                         entry<Screen.Error>( // TODO Navigating from a dialog (such as add submodule) to this produces a crash
                             metadata = dialogsMetadata
                         ) {
+                            // Reuse the already-created repo view model (if a repo is open) so the
+                            // dialog can show the live repository state and act on it
+                            val repositoryOpenViewModel =
+                                repositoryTabViewModel.viewModelsMap[Screen.RepositoryOpen] as? RepositoryOpenViewModel
+                            val repositoryState = repositoryOpenViewModel?.repositoryState?.collectAsState()?.value
+                            val currentBranch = repositoryOpenViewModel?.currentBranchName?.collectAsState(null)?.value
+
+                            // Offer force-push when a normal push was rejected as non-fast-forward
+                            // (typical after a rebase/amend rewrote local history)
+                            val failedTask = it.error
+                            val pushRejected = failedTask.taskType == TaskType.Push &&
+                                ((failedTask.reason as? GenericError)?.message?.let { m ->
+                                    m.contains("reject", ignoreCase = true) &&
+                                        (m.contains("non-fast-forward", ignoreCase = true) ||
+                                            m.contains("do not have locally", ignoreCase = true) ||
+                                            m.contains("remote contains work", ignoreCase = true))
+                                } == true)
+
                             ErrorDialog(
                                 error = it.error,
                                 onAccept = {
                                     backStack.removeLastOrNull()
                                     repositoryTabViewModel.completedTaskAlreadyShown(it.error)
                                 },
+                                repositoryState = repositoryState,
+                                currentBranchName = currentBranch?.simpleName,
+                                onAbortOperation = repositoryOpenViewModel?.let { vm ->
+                                    {
+                                        if (repositoryState?.isRebasing == true) {
+                                            vm.onAction(StatusAction.AbortRebase)
+                                        } else {
+                                            vm.onAction(StatusAction.ResetRepositoryState)
+                                        }
+                                    }
+                                },
+                                onContinueOperation = repositoryOpenViewModel?.let { vm ->
+                                    { vm.onAction(StatusAction.ContinueRebase("")) }
+                                },
+                                onForcePush = if (pushRejected && repositoryOpenViewModel != null) {
+                                    { repositoryOpenViewModel.push(force = true) }
+                                } else null,
                             )
                         }
                         entry<Screen.AddEditRemote>(

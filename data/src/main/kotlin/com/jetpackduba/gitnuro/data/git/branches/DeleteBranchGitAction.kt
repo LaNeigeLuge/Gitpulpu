@@ -5,7 +5,9 @@ import com.jetpackduba.gitnuro.domain.interfaces.IDeleteBranchGitAction
 import com.jetpackduba.gitnuro.domain.models.Branch
 import javax.inject.Inject
 
-class DeleteBranchGitAction @Inject constructor(private val jgit: JGit) : IDeleteBranchGitAction {
+class DeleteBranchGitAction @Inject constructor(
+    private val jgit: JGit,
+) : IDeleteBranchGitAction {
     override suspend operator fun invoke(repositoryPath: String, branch: Branch) = jgit.provide(repositoryPath) { git ->
         git
             .branchDelete()

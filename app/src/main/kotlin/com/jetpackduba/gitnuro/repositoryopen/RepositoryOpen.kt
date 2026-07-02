@@ -21,8 +21,11 @@ import com.jetpackduba.gitnuro.app.generated.resources.bottom_info_bar_email_not
 import com.jetpackduba.gitnuro.app.generated.resources.bottom_info_bar_name_and_email
 import com.jetpackduba.gitnuro.app.generated.resources.bottom_info_bar_name_not_set
 import com.jetpackduba.gitnuro.domain.models.Identity
+import com.jetpackduba.gitnuro.domain.models.ConflictChoice
+import com.jetpackduba.gitnuro.domain.models.DiffSelected
 import com.jetpackduba.gitnuro.domain.models.PullType
 import com.jetpackduba.gitnuro.domain.models.RebaseInteractiveState
+import com.jetpackduba.gitnuro.domain.models.StatusType
 import com.jetpackduba.gitnuro.domain.models.ui.SelectedItem
 import com.jetpackduba.gitnuro.extensions.handMouseClickable
 import com.jetpackduba.gitnuro.keybindings.KeybindingOption
@@ -30,9 +33,12 @@ import com.jetpackduba.gitnuro.keybindings.matchesBinding
 import com.jetpackduba.gitnuro.theme.backgroundGradientEnd
 import com.jetpackduba.gitnuro.ui.*
 import com.jetpackduba.gitnuro.ui.components.BottomInfoBar
+import com.jetpackduba.gitnuro.ui.components.DetachedHeadBanner
+import com.jetpackduba.gitnuro.ui.components.RepositoryStateBanner
 import com.jetpackduba.gitnuro.ui.components.TripleVerticalSplitPanel
 import com.jetpackduba.gitnuro.ui.diff.DiffPane
 import com.jetpackduba.gitnuro.ui.log.Log
+import com.jetpackduba.gitnuro.ui.status.StatusAction
 import com.jetpackduba.gitnuro.ui.status.StatusPane
 import com.jetpackduba.gitnuro.updates.Update
 import kotlinx.coroutines.flow.collectLatest
@@ -146,6 +152,32 @@ fun RepositoryOpenPage(
                     showOpenPopup = showOpenPopup,
                     onShowOpenPopupChange = { showOpenPopup = it }
                 )
+
+                if (repositoryState != RepositoryState.SAFE && repositoryState != RepositoryState.BARE) {
+                    RepositoryStateBanner(
+                        repositoryState = repositoryState,
+                        onAbort = {
+                            if (repositoryState.isRebasing) {
+                                repositoryOpenViewModel.onAction(StatusAction.AbortRebase)
+                            } else {
+                                repositoryOpenViewModel.onAction(StatusAction.ResetRepositoryState)
+                            }
+                        },
+                        onContinue = { repositoryOpenViewModel.onAction(StatusAction.ContinueRebase("")) },
+                        onSkip = { repositoryOpenViewModel.onAction(StatusAction.SkipRebase) },
+                    )
+                } else {
+                    // Detached HEAD (not mid-operation): warn that commits won't belong to a branch
+                    val isDetached by repositoryOpenViewModel.isHeadDetached.collectAsState()
+                    if (isDetached) {
+                        val localBranches by repositoryOpenViewModel.localBranchesList.collectAsState()
+                        DetachedHeadBanner(
+                            localBranches = localBranches,
+                            onCreateBranch = { onNavigate(Screen.BranchCreate(null)) },
+                            onMoveToBranch = { repositoryOpenViewModel.moveDetachedCommitToBranch(it) },
+                        )
+                    }
+                }
 
                 RepoContent(
                     repositoryOpenViewModel = repositoryOpenViewModel,
@@ -267,6 +299,24 @@ fun MainContentView(
 
     val statusState by viewModel.statusState.collectAsState()
 
+    val conflictedFile by viewModel.conflictedFile.collectAsState()
+
+    // A single selected conflicting file routes the center panel to the merge editor
+    val selectedConflictPath = (diffSelected as? DiffSelected.UncommittedChanges)
+        ?.items
+        ?.singleOrNull()
+        ?.takeIf { it.statusEntry.statusType == StatusType.CONFLICTING }
+        ?.statusEntry
+        ?.filePath
+
+    LaunchedEffect(selectedConflictPath) {
+        if (selectedConflictPath != null) {
+            viewModel.loadConflictedFile(selectedConflictPath)
+        } else {
+            viewModel.closeConflictedFile()
+        }
+    }
+
     // We create 2 mutableStates here because using directly the flow makes compose lose some drag events for some reason
     var firstWidth by remember(viewModel) { mutableStateOf(viewModel.firstPaneWidth.value) }
     var thirdWidth by remember(viewModel) { mutableStateOf(viewModel.thirdPaneWidth.value) }
@@ -294,7 +344,24 @@ fun MainContentView(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                if (rebaseInteractiveState == RebaseInteractiveState.AwaitingInteraction /*&& diffSelected == null*/) {
+                val currentConflict = conflictedFile
+                if (currentConflict != null && selectedConflictPath != null) {
+                    ConflictResolver(
+                        conflictedFile = currentConflict,
+                        onSave = { resolved ->
+                            viewModel.resolveConflictWithContent(selectedConflictPath, resolved)
+                        },
+                        onUseAllOurs = {
+                            viewModel.resolveConflictWithChoice(selectedConflictPath, ConflictChoice.OURS)
+                        },
+                        onUseAllTheirs = {
+                            viewModel.resolveConflictWithChoice(selectedConflictPath, ConflictChoice.THEIRS)
+                        },
+                        onClose = { viewModel.closeConflictedFile() },
+                    )
+                } else if (rebaseInteractiveState == RebaseInteractiveState.AwaitingInteraction) {
+                    // Todo-editing phase of an interactive rebase: pick/reword/squash/drop/reorder,
+                    // then "Complete rebase" applies the edited plan (PROCESS_STEPS).
                     RebaseInteractive(viewModel)
                 } else if (blameState is BlameState.Loaded && !blameState.isMinimized) {
                     Blame(

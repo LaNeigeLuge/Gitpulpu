@@ -17,6 +17,8 @@ interface RepositoryDataRepository {
     val repositorySelectionState: StateFlow<RepositorySelectionState>
     val repositoryState: StateFlow<RepositoryState>
     val rebaseInteractiveState: StateFlow<RebaseInteractiveState>
+    val lastUndoableAction: StateFlow<UndoableAction?>
+    val isHeadDetached: StateFlow<Boolean>
     val repositoryPath: String?
     val submodules: Flow<Map<String, SubmoduleStatus>>
     val author: Flow<AuthorInfo>
@@ -32,4 +34,8 @@ interface RepositoryDataRepository {
     fun updateStashes(stashes: List<Commit>)
     fun updateSubmodules(value: Map<String, SubmoduleStatus>)
     fun updateAuthor(value: AuthorInfo)
+    fun updateRepositoryState(state: RepositoryState)
+    fun updateRebaseInteractiveState(state: RebaseInteractiveState)
+    fun updateLastUndoableAction(action: UndoableAction?)
+    fun updateIsHeadDetached(detached: Boolean)
 }

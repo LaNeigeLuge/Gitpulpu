@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +16,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jetpackduba.gitnuro.extensions.backgroundIf
@@ -103,25 +106,46 @@ fun RebaseStateLoaded(
             .clip(AppShapes.small)
             .background(MaterialTheme.colors.background)
     ) {
-        Text(
-            text = stringResource(Res.string.rebase_interactive_view_title),
-            color = MaterialTheme.colors.onBackground,
-            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-            fontSize = 20.sp,
-        )
+        // Header
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.surface)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(Res.string.rebase_interactive_view_title),
+                color = MaterialTheme.colors.onBackground,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Text(
+                text = "${stepsList.size} commits",
+                color = MaterialTheme.colors.onBackgroundSecondary,
+                fontSize = 12.sp,
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Legend
+            RebaseActionLegend()
+        }
+
+        Divider(color = MaterialTheme.colors.onBackground.copy(alpha = 0.08f))
 
         val listState = rememberLazyListState()
         val state = rememberVerticalDragDropState(listState) { fromIndex, toIndex ->
-            println("P0: $fromIndex\nP1: $toIndex")
             onMoveCommit(fromIndex, toIndex)
         }
 
         ScrollableLazyColumn(
             modifier = Modifier
                 .weight(1f)
-                .verticalDragContainer(state, onDraggedItem = {
-                    println("OnDragItem $it")
-                }),
+                .verticalDragContainer(state, onDraggedItem = {}),
             state = listState,
         ) {
             itemsIndexed(
@@ -148,8 +172,13 @@ fun RebaseStateLoaded(
             }
         }
 
+        Divider(color = MaterialTheme.colors.onBackground.copy(alpha = 0.08f))
+
         Row(
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.surface)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Spacer(modifier = Modifier.weight(1f))
@@ -163,13 +192,40 @@ fun RebaseStateLoaded(
             )
 
             PrimaryButton(
-                modifier = Modifier.padding(end = 16.dp),
-                enabled = true, // TODO Moving commits may also affect stepsList.any { it.rebaseAction != RebaseAction.PICK },
+                modifier = Modifier,
+                enabled = true,
                 onClick = {
                     viewModel.continueRebaseInteractive()
                 },
                 text = stringResource(Res.string.rebase_interactive_view_button_complete_rebase)
             )
+        }
+    }
+}
+
+@Composable
+private fun RebaseActionLegend() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        for (action in listOf(RebaseAction.PICK, RebaseAction.REWORD, RebaseAction.SQUASH, RebaseAction.DROP)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .clip(AppShapes.small)
+                        .background(action.color())
+                )
+                Text(
+                    text = action.displayName,
+                    color = MaterialTheme.colors.onBackgroundSecondary,
+                    fontSize = 10.sp,
+                )
+            }
         }
     }
 }
@@ -185,26 +241,42 @@ fun RebaseCommit(
     onMessageChanged: (String) -> Unit,
 ) {
     val action = rebaseLine.rebaseAction
+    val isDrop = action == RebaseAction.DROP
     val focusRequester = remember { FocusRequester() }
 
     var newMessage by remember(rebaseLine.commit.name(), action) {
         if (action == RebaseAction.REWORD) {
-            mutableStateOf(message ?: rebaseLine.shortMessage) /* if reword, use the value from the map (if possible)*/
+            mutableStateOf(message ?: rebaseLine.shortMessage)
         } else
-            mutableStateOf(rebaseLine.shortMessage) // If it's not reword, use the original shortMessage
+            mutableStateOf(rebaseLine.shortMessage)
     }
 
     Row(
         modifier = Modifier
             .height(IntrinsicSize.Min)
             .fillMaxWidth()
-            .clickable {
-                onFocusLine()
-            }
+            .clickable { onFocusLine() }
             .backgroundIf(isSelected, MaterialTheme.colors.backgroundSelected)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        // Color bar on the left edge
+        Box(
+            modifier = Modifier
+                .width(4.dp)
+                .fillMaxHeight()
+                .background(action.color())
+        )
+
+        // Drag handle
+        Text(
+            text = "⠿",
+            color = MaterialTheme.colors.onBackgroundSecondary.copy(alpha = 0.4f),
+            fontSize = 16.sp,
+            modifier = Modifier.padding(horizontal = 8.dp),
+        )
+
+        // Action chip
         ActionDropdown(
             action,
             isFirst = isFirst,
@@ -212,29 +284,51 @@ fun RebaseCommit(
             onActionChanged = onActionChanged,
         )
 
-        AdjustableOutlinedTextField(
-            modifier = Modifier
-                .padding(start = 8.dp)
-                .weight(1f)
-                .heightIn(min = 40.dp)
-                .focusRequester(focusRequester)
-                .onFocusChanged {
-                    if (it.hasFocus && !isSelected) {
-                        onFocusLine()
-                    }
-                },
-            enabled = action == RebaseAction.REWORD,
-            value = newMessage,
-            onValueChange = {
-                newMessage = it
-                onMessageChanged(it)
-            },
-            textStyle = MaterialTheme.typography.body2,
-            backgroundColor = if (action == RebaseAction.REWORD) {
-                MaterialTheme.colors.background
-            } else
-                MaterialTheme.colors.surface
+        // Short hash
+        Text(
+            text = rebaseLine.commit.name().take(7),
+            color = if (isDrop) MaterialTheme.colors.onBackgroundSecondary.copy(alpha = 0.3f)
+                    else MaterialTheme.colors.primary,
+            fontSize = 12.sp,
+            fontFamily = FontFamily.Monospace,
+            modifier = Modifier.padding(horizontal = 8.dp),
         )
+
+        // Commit message
+        if (action == RebaseAction.REWORD) {
+            AdjustableOutlinedTextField(
+                modifier = Modifier
+                    .weight(1f)
+                    .heightIn(min = 36.dp)
+                    .focusRequester(focusRequester)
+                    .onFocusChanged {
+                        if (it.hasFocus && !isSelected) {
+                            onFocusLine()
+                        }
+                    },
+                enabled = true,
+                value = newMessage,
+                onValueChange = {
+                    newMessage = it
+                    onMessageChanged(it)
+                },
+                textStyle = MaterialTheme.typography.body2,
+                backgroundColor = MaterialTheme.colors.background,
+            )
+        } else {
+            Text(
+                text = newMessage,
+                color = if (isDrop) MaterialTheme.colors.onBackgroundSecondary.copy(alpha = 0.3f)
+                        else MaterialTheme.colors.onBackground,
+                style = MaterialTheme.typography.body2,
+                textDecoration = if (isDrop) TextDecoration.LineThrough else TextDecoration.None,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 16.dp),
+            )
+        }
     }
 }
 
@@ -247,11 +341,14 @@ fun ActionDropdown(
     onActionChanged: (RebaseAction) -> Unit,
 ) {
     var showDropDownMenu by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
+            .clip(AppShapes.small)
+            .background(action.color().copy(alpha = 0.15f))
             .border(
-                width = 2.dp,
-                color = MaterialTheme.colors.onBackgroundSecondary.copy(alpha = 0.2f),
+                width = 1.dp,
+                color = action.color().copy(alpha = 0.3f),
                 shape = AppShapes.small,
             )
     ) {
@@ -261,22 +358,23 @@ fun ActionDropdown(
                 onActionDropDownClicked()
             },
             modifier = Modifier
-                .width(120.dp)
-                .height(40.dp),
+                .width(100.dp)
+                .height(32.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp),
         ) {
             Text(
                 action.displayName,
-                color = MaterialTheme.colors.onBackground,
-                style = MaterialTheme.typography.body1,
-                modifier = Modifier.weight(1f)
+                color = action.color(),
+                style = MaterialTheme.typography.body2,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.weight(1f),
             )
 
             Icon(
                 painterResource(Res.drawable.expand_more),
                 contentDescription = null,
-                modifier = Modifier
-                    .size(20.dp),
-                tint = MaterialTheme.colors.onBackground,
+                modifier = Modifier.size(16.dp),
+                tint = action.color(),
             )
         }
 
@@ -297,13 +395,33 @@ fun ActionDropdown(
                         onActionChanged(dropDownOption)
                     }
                 ) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(AppShapes.small)
+                            .background(dropDownOption.color())
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = dropDownOption.displayName,
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.body2,
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun RebaseAction.color(): Color {
+    return when (this) {
+        RebaseAction.PICK -> MaterialTheme.colors.primary
+        RebaseAction.REWORD -> Color(0xFF4438D0)
+        RebaseAction.SQUASH -> Color(0xFFD88020)
+        RebaseAction.FIXUP -> Color(0xFF2E8C48)
+        RebaseAction.EDIT -> Color(0xFF7B74FF)
+        RebaseAction.DROP -> MaterialTheme.colors.error
+        RebaseAction.COMMENT -> MaterialTheme.colors.onBackgroundSecondary
     }
 }
 

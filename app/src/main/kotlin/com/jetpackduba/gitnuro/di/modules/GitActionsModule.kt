@@ -6,6 +6,7 @@ import com.jetpackduba.gitnuro.data.git.author.SaveAuthorGitAction
 import com.jetpackduba.gitnuro.data.git.branches.*
 import com.jetpackduba.gitnuro.data.git.config.LoadSignOffConfigGitAction
 import com.jetpackduba.gitnuro.data.git.config.SaveLocalRepositoryConfigGitAction
+import com.jetpackduba.gitnuro.data.git.conflicts.*
 import com.jetpackduba.gitnuro.data.git.diff.*
 import com.jetpackduba.gitnuro.data.git.lfs.*
 import com.jetpackduba.gitnuro.data.git.log.*
@@ -32,6 +33,21 @@ interface GitActionsModule {
 
     @Binds
     fun bindsAbortRebaseGitAction(action: AbortRebaseGitAction): IAbortRebaseGitAction
+
+    @Binds
+    fun bindsGetConflictedFileGitAction(action: GetConflictedFileGitAction): IGetConflictedFileGitAction
+
+    @Binds
+    fun bindsResolveConflictGitAction(action: ResolveConflictGitAction): IResolveConflictGitAction
+
+    @Binds
+    fun bindsUndoLastActionGitAction(action: com.jetpackduba.gitnuro.data.git.undo.UndoLastActionGitAction): IUndoLastActionGitAction
+
+    @Binds
+    fun bindsGetHeadGitAction(action: com.jetpackduba.gitnuro.data.git.undo.GetHeadGitAction): IGetHeadGitAction
+
+    @Binds
+    fun bindsMoveCommitToBranchGitAction(action: com.jetpackduba.gitnuro.data.git.undo.MoveCommitToBranchGitAction): IMoveCommitToBranchGitAction
 
     @Binds
     fun bindsAddRemoteGitAction(action: AddRemoteGitAction): IAddRemoteGitAction

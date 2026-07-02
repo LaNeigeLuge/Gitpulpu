@@ -43,6 +43,11 @@ fun QuickActionsDialog(
             QuickAction(Res.drawable.download, "Clone new repository", QuickActionType.CLONE),
             QuickAction(Res.drawable.refresh, "Refresh repository data", QuickActionType.REFRESH),
             QuickAction(Res.drawable.sign, "Signoff config", QuickActionType.SIGN_OFF),
+            QuickAction(
+                Res.drawable.warning,
+                "Reset repository state (abort rebase/merge/cherry-pick)",
+                QuickActionType.RESET_REPO_STATE,
+            ),
         )
     }
 
@@ -66,6 +71,7 @@ fun QuickActionsDialog(
                 QuickActionType.CLONE -> onShowClone()
                 QuickActionType.REFRESH -> viewModel.refreshRepository()
                 QuickActionType.SIGN_OFF -> onShowSignOff()
+                QuickActionType.RESET_REPO_STATE -> viewModel.resetRepositoryState()
             }
             
             onDismiss()
@@ -166,5 +172,6 @@ enum class QuickActionType {
     OPEN_DIR_IN_FILE_MANAGER,
     CLONE,
     REFRESH,
-    SIGN_OFF
+    SIGN_OFF,
+    RESET_REPO_STATE,
 }

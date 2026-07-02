@@ -43,6 +43,12 @@ class InMemoryRepositoryDataRepository @Inject constructor() : RepositoryDataRep
     override val rebaseInteractiveState: StateFlow<RebaseInteractiveState>
         field = MutableStateFlow<RebaseInteractiveState>(RebaseInteractiveState.None)
 
+    override val lastUndoableAction: StateFlow<UndoableAction?>
+        field = MutableStateFlow<UndoableAction?>(null)
+
+    override val isHeadDetached: StateFlow<Boolean>
+        field = MutableStateFlow(false)
+
     override val author: Flow<AuthorInfo>
         field = MutableStateFlow(AuthorInfo(emptyIdentity(), emptyIdentity()))
 
@@ -100,5 +106,21 @@ class InMemoryRepositoryDataRepository @Inject constructor() : RepositoryDataRep
 
     override fun updateAuthor(value: AuthorInfo) {
         this.author.value = value
+    }
+
+    override fun updateRepositoryState(state: RepositoryState) {
+        this.repositoryState.value = state
+    }
+
+    override fun updateRebaseInteractiveState(state: RebaseInteractiveState) {
+        this.rebaseInteractiveState.value = state
+    }
+
+    override fun updateLastUndoableAction(action: UndoableAction?) {
+        this.lastUndoableAction.value = action
+    }
+
+    override fun updateIsHeadDetached(detached: Boolean) {
+        this.isHeadDetached.value = detached
     }
 }

@@ -50,6 +50,7 @@ import com.jetpackduba.gitnuro.theme.onBackgroundSecondary
 import com.jetpackduba.gitnuro.ui.components.PrimaryButton
 import com.jetpackduba.gitnuro.ui.components.tooltip.InstantTooltip
 import com.jetpackduba.gitnuro.ui.context_menu.*
+import com.jetpackduba.gitnuro.ui.dialogs.ForcePushConfirmationDialog
 import com.jetpackduba.gitnuro.repositoryopen.RepositoryOpenViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -71,6 +72,17 @@ fun Menu(
     val isPullWithRebaseDefault by viewModel.isPullWithRebaseDefault.collectAsState(false)
     val lastLoadedTabs by viewModel.lastLoadedTabs.collectAsState()
     val (position, setPosition) = remember { mutableStateOf<LayoutCoordinates?>(null) }
+    var showForcePushConfirm by remember { mutableStateOf(false) }
+
+    if (showForcePushConfirm) {
+        ForcePushConfirmationDialog(
+            onDismiss = { showForcePushConfirm = false },
+            onConfirm = {
+                showForcePushConfirm = false
+                viewModel.push(force = true)
+            },
+        )
+    }
 
     val surfaceColor = MaterialTheme.colors.surface
     val bgColor = MaterialTheme.colors.background
@@ -151,7 +163,8 @@ fun Menu(
                     viewModel.push(force = false, pushTags = true)
                 },
                 onForcePush = {
-                    viewModel.push(force = true)
+                    // Proactive confirm — force push can overwrite others' work
+                    showForcePushConfirm = true
                 }
             )
         )
@@ -191,6 +204,18 @@ fun Menu(
         ) { viewModel.popStash() }
 
         Spacer(modifier = Modifier.weight(1f))
+
+        val lastUndoable by viewModel.lastUndoableAction.collectAsState()
+        if (lastUndoable != null) {
+            MenuButton(
+                modifier = Modifier.padding(end = 4.dp),
+                title = "Undo",
+                icon = painterResource(Res.drawable.undo),
+                onClick = { viewModel.undoLastAction() },
+                tooltip = "Undo: ${lastUndoable?.summary}",
+                keybinding = null,
+            )
+        }
 
         MenuButton(
             modifier = Modifier.padding(end = 4.dp),

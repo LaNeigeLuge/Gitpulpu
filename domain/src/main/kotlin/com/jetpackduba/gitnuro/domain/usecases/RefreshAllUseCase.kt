@@ -12,6 +12,7 @@ class RefreshAllUseCase @Inject constructor(
     private val refreshSubmodulesUseCase: RefreshSubmodulesUseCase,
     private val refreshGitConfigUseCase: RefreshGitConfigUseCase,
     private val refreshTagsUseCase: RefreshTagsUseCase,
+    private val refreshRepositoryStateUseCase: RefreshRepositoryStateUseCase,
 ) {
     operator fun invoke() {
         refreshBranchesUseCase()
@@ -22,5 +23,6 @@ class RefreshAllUseCase @Inject constructor(
         refreshSubmodulesUseCase()
         refreshGitConfigUseCase()
         refreshTagsUseCase()
+        refreshRepositoryStateUseCase()
     }
 }

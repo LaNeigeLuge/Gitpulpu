@@ -9,11 +9,13 @@ import javax.inject.Inject
 class StartRebaseInteractiveUseCase @Inject constructor(
     private val useCaseExecutor: UseCaseExecutor,
     private val startRebaseInteractiveGitAction: IStartRebaseInteractiveGitAction,
+    private val refreshRepositoryStateUseCase: RefreshRepositoryStateUseCase,
 ) {
     operator fun invoke(commit: Commit) =  useCaseExecutor.executeLaunch(
         taskType = TaskType.RebaseInteractive,
         onRefresh = {
-            // TODO Refresh rebase interactive state?
+            // Surface the new REBASING_INTERACTIVE / AwaitingInteraction state so the editor appears
+            refreshRepositoryStateUseCase()
         }
     ) { repositoryPath ->
         startRebaseInteractiveGitAction(repositoryPath, commit)

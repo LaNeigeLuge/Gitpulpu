@@ -91,6 +91,11 @@ class RepositoryOpenViewModel @Inject constructor(
     private val refreshAllUseCase: RefreshAllUseCase,
     private val refreshStatusUseCase: RefreshStatusUseCase,
     private val refreshLogUseCase: RefreshLogUseCase,
+    private val refreshRepositoryStateUseCase: RefreshRepositoryStateUseCase,
+    private val getConflictedFileUseCase: GetConflictedFileUseCase,
+    private val resolveConflictUseCase: ResolveConflictUseCase,
+    private val undoLastActionUseCase: UndoLastActionUseCase,
+    private val moveCommitToBranchUseCase: MoveCommitToBranchUseCase,
     private val blameFileUseCase: BlameFileUseCase,
     updatesRepository: UpdatesRepository,
     private val fetchRemotesUseCase: FetchRemotesUseCase,
@@ -132,6 +137,7 @@ class RepositoryOpenViewModel @Inject constructor(
     private val settings: AppSettingsService,
 //    private val getRebaseLinesFullMessageGitAction: IGetRebaseLinesFullMessageGitAction,
     private val getCommitFromRebaseLineUseCase: GetCommitFromRebaseLineUseCase,
+    private val loadRebaseInteractiveUseCase: LoadRebaseInteractiveUseCase,
     private val resumeRebaseInteractiveUseCase: ResumeRebaseInteractiveUseCase,
     private val repositoryDataRepository: RepositoryDataRepository,
     private val statusViewModelExtenderFactory: StatusViewModelExtender.Factory,
@@ -151,6 +157,15 @@ class RepositoryOpenViewModel @Inject constructor(
 
     val repositoryState: StateFlow<RepositoryState> = repositoryDataRepository.repositoryState
     val rebaseInteractiveState: StateFlow<RebaseInteractiveState> = repositoryDataRepository.rebaseInteractiveState
+    val currentBranchName = repositoryDataRepository.currentBranch
+    val lastUndoableAction: StateFlow<UndoableAction?> = repositoryDataRepository.lastUndoableAction
+    val isHeadDetached: StateFlow<Boolean> = repositoryDataRepository.isHeadDetached
+    val localBranchesList: StateFlow<List<Branch>> = repositoryDataRepository.localBranches
+        .stateIn(emptyList())
+
+    fun undoLastAction() = undoLastActionUseCase()
+
+    fun moveDetachedCommitToBranch(branch: Branch) = moveCommitToBranchUseCase(branch.name)
 
     val filter: StateFlow<String>
         field = MutableStateFlow("")
@@ -580,6 +595,7 @@ class RepositoryOpenViewModel @Inject constructor(
     private suspend fun checkUncommittedChanges() {
         refreshStatusUseCase()
         refreshLogUseCase()
+        refreshRepositoryStateUseCase()
     }
 
     private suspend fun refreshRepositoryInfo() {
@@ -1024,6 +1040,34 @@ class RepositoryOpenViewModel @Inject constructor(
         }
     }
 
+    val conflictedFile: StateFlow<ConflictedFile?>
+        field = MutableStateFlow<ConflictedFile?>(null)
+
+    fun loadConflictedFile(filePath: String) {
+        viewModelScope.launch {
+            when (val result = getConflictedFileUseCase(filePath)) {
+                is Either.Ok -> conflictedFile.value = result.value
+                is Either.Err -> conflictedFile.value = null
+            }
+        }
+    }
+
+    fun closeConflictedFile() {
+        conflictedFile.value = null
+    }
+
+    /** Save the merge-editor result (already-assembled content) and stage the file. */
+    fun resolveConflictWithContent(filePath: String, resolvedContent: String) {
+        resolveConflictUseCase.withContent(filePath, resolvedContent)
+        conflictedFile.value = null
+    }
+
+    /** Whole-file "use ours" / "use theirs". */
+    fun resolveConflictWithChoice(filePath: String, choice: ConflictChoice) {
+        resolveConflictUseCase.withChoice(filePath, choice)
+        conflictedFile.value = null
+    }
+
     val rebaseState: StateFlow<RebaseInteractiveViewState>
         field = MutableStateFlow<RebaseInteractiveViewState>(RebaseInteractiveViewState.Loading)
 
@@ -1080,60 +1124,35 @@ class RepositoryOpenViewModel @Inject constructor(
     }
 
     fun loadRebaseInteractiveData() {
-        // TODO Move this to use case
-//        viewModelScope.launch {
-//            val stateResult = getRepositoryStateUseCase()
-//
-//            when (stateResult) {
-//                is Either.Err -> {
-//                    _rebaseState.value = RebaseInteractiveViewState.Failed(stateResult.error.toString())
-//                }
-//
-//                is Either.Ok -> {
-//                    val state = stateResult.value
-//                    if (!state.isRebasing) {
-//                        _rebaseState.value = RebaseInteractiveViewState.Loading
-//                        return@launch
-//                    }
-//                }
-//            }
-//        }
-//
-//
-//
-//        try {
-//            val lines = getRebaseInteractiveTodoLinesGitAction(git)
-//            val messages = getRebaseLinesFullMessageGitAction(tabState.git, lines)
-//            val rebaseLines = lines.map {
-//                RebaseLine(
-//                    it.action.toRebaseAction(),
-//                    it.commit,
-//                    it.shortMessage,
-//                )
-//            }
-//
-//            val isSameRebase = isSameRebase(rebaseLines, _rebaseState.value)
-//
-//            if (!isSameRebase) {
-//                _rebaseState.value = RebaseInteractiveViewState.Loaded(rebaseLines, messages)
-//                val firstLine = rebaseLines.firstOrNull()
-//
-//                if (firstLine != null) {
-//                    val fullCommit = getCommitFromRebaseLineUseCase(firstLine.commit, firstLine.shortMessage)
-//                    tabState.newSelectedCommit(fullCommit)
-//                }
-//            }
-//
-//        } catch (ex: Exception) {
-//            if (ex is RebaseCancelledException) {
-//                println("Rebase cancelled")
-//            } else {
-//                cancel()
-//                throw ex
-//            }
-//        }
-//
-//        null
+        viewModelScope.launch {
+            when (val result = loadRebaseInteractiveUseCase()) {
+                is Either.Ok -> {
+                    val data = result.value
+
+                    // Convert the domain todo lines into the view-model lines the editor uses.
+                    // COMMENT lines (blank/comment entries in the todo file) aren't user-editable.
+                    val steps = data.lines
+                        .filter { it.action != com.jetpackduba.gitnuro.domain.models.RebaseAction.COMMENT }
+                        .map { line ->
+                            RebaseLine(
+                                rebaseAction = RebaseAction.valueOf(line.action.name),
+                                commit = AbbreviatedObjectId.fromString(line.commit),
+                                shortMessage = line.shortMessage,
+                            )
+                        }
+
+                    val newState = RebaseInteractiveViewState.Loaded(steps, data.messages)
+
+                    if (!isSameRebase(steps, rebaseState.value)) {
+                        rebaseState.value = newState
+                    }
+                }
+
+                is Either.Err -> {
+                    rebaseState.value = RebaseInteractiveViewState.Failed(result.error.toString())
+                }
+            }
+        }
     }
 
     private fun isSameRebase(rebaseLines: List<RebaseLine>, state: RebaseInteractiveViewState): Boolean {
