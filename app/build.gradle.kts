@@ -153,18 +153,18 @@ compose.desktop {
             description = "Multiplatform Git client"
 
             windows {
-                iconFile.set(project.file("icons/icon.ico"))
+                iconFile.set(rootProject.file("icons/icon.ico"))
             }
 
             linux {
-                iconFile.set(project.file("icons/logo.svg"))
+                iconFile.set(rootProject.file("icons/logo.svg"))
             }
 
             macOS {
                 jvmArgs(
                     "-Dapple.awt.application.appearance=system"
                 )
-                iconFile.set(project.file("icons/icon.icns"))
+                iconFile.set(rootProject.file("icons/icon.icns"))
             }
         }
     }
@@ -300,7 +300,7 @@ fun buildRust(isRelease: Boolean = isRustRelease, cross: Boolean = useCross) {
         params.add("--release")
     }
 
-    if (currentOs() == OS.LINUX && useCross) {
+    if (currentOs() == OS.LINUX && cross) {
         if (isLinuxAarch64) {
             params.add("--target=$linuxArmTarget")
         } else {
