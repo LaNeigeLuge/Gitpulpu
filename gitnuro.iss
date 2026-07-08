@@ -20,7 +20,7 @@ DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 Compression=lzma
 OutputBaseFilename={#MyAppName}_Windows_Installer_{#MyAppVersion}
-SetupIconFile=build\compose\binaries\main\app\Gitpulpu\Gitpulpu.ico
+SetupIconFile=app\build\compose\binaries\main\app\Gitpulpu\Gitpulpu.ico
 SolidCompression=yes
 WizardStyle=modern
 
@@ -31,8 +31,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "build\compose\binaries\main\app\Gitpulpu\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\compose\binaries\main\app\Gitpulpu\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "app\build\compose\binaries\main\app\Gitpulpu\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "app\build\compose\binaries\main\app\Gitpulpu\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"

@@ -850,19 +850,23 @@ private fun CommitLine(
                 }
             }
 
+            // A tagged commit is usually a release — band the whole row to separate it visually
+            val isTagged = tags.isNotEmpty()
+
             Box(
                 modifier = Modifier
                     .padding(start = graphWidth)
                     .fillMaxHeight()
                     .background(MaterialTheme.colors.surface)
+                    .backgroundIf(isTagged, MaterialTheme.colors.secondary.copy(alpha = 0.13f))
                     .backgroundIf(isSelected, MaterialTheme.colors.backgroundSelected)
             ) {
-                // Branch color accent strip — solid color, Caldera style: shout or stay silent
+                // Branch/release color accent strip — thicker on tagged (release) rows
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(3.dp)
-                        .background(nodeColor)
+                        .width(if (isTagged) 5.dp else 3.dp)
+                        .background(if (isTagged) MaterialTheme.colors.secondary else nodeColor)
                 )
 
                 if (matchesSearchFilter == true) {
@@ -951,7 +955,8 @@ fun CommitMessage(
                 for (tag in tags) {
                     TagChip(
                         tag = tag,
-                        color = nodeColor,
+                        // Distinct release color so tags stand apart from branch chips
+                        color = MaterialTheme.colors.secondary,
                         onCheckoutTag = { onCheckoutTag(tag) },
                         onDeleteTag = { onDeleteTag(tag) },
                     )

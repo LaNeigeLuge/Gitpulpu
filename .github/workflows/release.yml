@@ -43,7 +43,7 @@ jobs:
         run: ./gradlew fatJarLinux -PuseCross=true -PisLinuxAarch64=false
 
       - name: Generate SHA256 checksum
-        working-directory: ./build/libs
+        working-directory: ./app/build/libs
         run: find . -type f -name "*.jar" -exec bash -c 'sha256sum "$1" > "$1.sum"' _ {} \;
 
       - name: Release
@@ -53,8 +53,8 @@ jobs:
           prerelease: true
           draft: true
           files: |
-            build/libs/Gitpulpu-linux-x86_64-*.jar
-            build/libs/Gitpulpu-linux-x86_64-*.jar.sum
+            app/build/libs/Gitpulpu-linux-x86_64-*.jar
+            app/build/libs/Gitpulpu-linux-x86_64-*.jar.sum
 
   build_linux_aarch64:
     runs-on: ubuntu-latest
@@ -92,7 +92,7 @@ jobs:
         run: ./gradlew fatJarLinux -PuseCross=true -PisLinuxAarch64=true
 
       - name: Generate SHA256 checksum
-        working-directory: ./build/libs
+        working-directory: ./app/build/libs
         run: find . -type f -name "*.jar" -exec bash -c 'sha256sum "$1" > "$1.sum"' _ {} \;
 
       - name: Release
@@ -102,8 +102,8 @@ jobs:
           prerelease: true
           draft: true
           files: |
-            build/libs/Gitpulpu-linux-arm_aarch64-*.jar
-            build/libs/Gitpulpu-linux-arm_aarch64-*.jar.sum
+            app/build/libs/Gitpulpu-linux-arm_aarch64-*.jar
+            app/build/libs/Gitpulpu-linux-arm_aarch64-*.jar.sum
 
   build_windows:
     runs-on: windows-latest
@@ -144,7 +144,7 @@ jobs:
           options: /O+ /DMyAppVersion="${{ github.ref_name }}"
 
       - name: Create portable ZIP
-        run: Compress-Archive -Path build/compose/binaries/main/app/Gitpulpu/* -Destination Output/Gitpulpu_Windows_Portable_${{ github.ref_name }}.zip
+        run: Compress-Archive -Path app/build/compose/binaries/main/app/Gitpulpu/* -Destination Output/Gitpulpu_Windows_Portable_${{ github.ref_name }}.zip
 
       - name: Generate SHA256 checksum
         shell: bash
@@ -199,8 +199,10 @@ jobs:
         run: ./gradlew createDistributable
 
       - name: Create macOS ZIP
-        working-directory: build/compose/binaries/main/app/
-        run: zip -r ../../../../../Output/Gitpulpu_macos_${{ github.ref_name }}.zip .
+        run: |
+          mkdir -p Output
+          cd app/build/compose/binaries/main/app/
+          zip -r "$GITHUB_WORKSPACE/Output/Gitpulpu_macos_${{ github.ref_name }}.zip" .
 
       - name: Generate SHA256 checksum
         working-directory: ./Output/
