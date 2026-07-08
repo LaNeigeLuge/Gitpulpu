@@ -36,6 +36,9 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Build Rust bindings
+        run: ./gradlew rustTasks -PuseCross=true -PisLinuxAarch64=false
+
       - name: Build fat JAR
         run: ./gradlew fatJarLinux -PuseCross=true -PisLinuxAarch64=false
 
@@ -82,6 +85,9 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Build Rust bindings
+        run: ./gradlew rustTasks -PuseCross=true -PisLinuxAarch64=true
+
       - name: Build fat JAR
         run: ./gradlew fatJarLinux -PuseCross=true -PisLinuxAarch64=true
 
@@ -124,6 +130,9 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      - name: Build Rust bindings
+        run: ./gradlew rustTasks
 
       - name: Build distributable
         run: ./gradlew createDistributable
@@ -182,6 +191,9 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      - name: Build Rust bindings
+        run: ./gradlew rustTasks
 
       - name: Build distributable
         run: ./gradlew createDistributable
