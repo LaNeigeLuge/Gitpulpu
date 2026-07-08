@@ -15,56 +15,41 @@ Fork of [Gitnuro](https://github.com/JetpackDuba/Gitnuro) with a redesigned UI, 
 
 ## Install
 
-Requires **JDK 17+** ([Adoptium](https://adoptium.net/) or your OS package manager).
+### Requirements
 
-### Linux
+- **JDK 17+** — [Adoptium](https://adoptium.net/) or your OS package manager. Gradle downloads the JDK 21 toolchain used for compilation automatically.
+- **Rust** (`rustc` + `cargo`) — [rustup.rs](https://rustup.rs). Used to build the native SSH component in `rs/`.
+- **cargo-kotars** — `cargo install cargo-kotars --git https://github.com/JetpackDuba/kotars`
+- **Perl** — required to build the vendored OpenSSL. Preinstalled on Linux/macOS; on Windows use [Strawberry Perl](https://strawberryperl.com/).
+- **git-lfs** — fonts are stored in Git LFS. Install it before cloning, or run `git lfs pull` after.
+
+On Windows, Rust also requires the Visual Studio C++ Build Tools (installed via rustup).
+
+### Linux / macOS
 
 ```bash
-git clone https://github.com/jujuroro93/Gitpulpu.git
+git clone https://github.com/LaNeigeLuge/Gitpulpu.git
 cd Gitpulpu
 ./gradlew run
 ```
 
-To add a desktop launcher:
-
-```bash
-./install-desktop.sh
-```
-
-### macOS
-
-```bash
-git clone https://github.com/jujuroro93/Gitpulpu.git
-cd Gitpulpu
-./gradlew run
-```
-
-To create an app bundle:
-
-```bash
-./gradlew packageDmg
-# Output: app/build/compose/binaries/main/dmg/
-```
+- Linux desktop launcher: `./install-desktop.sh`
+- macOS app bundle: `./gradlew packageDmg` (output in `app/build/compose/binaries/main/dmg/`)
 
 ### Windows
 
 ```powershell
-git clone https://github.com/jujuroro93/Gitpulpu.git
+git clone https://github.com/LaNeigeLuge/Gitpulpu.git
 cd Gitpulpu
 .\gradlew.bat run
 ```
 
-To create an installer:
-
-```powershell
-.\gradlew.bat packageMsi
-# Output: app\build\compose\binaries\main\msi\
-```
+Installer: `.\gradlew.bat packageMsi` (output in `app\build\compose\binaries\main\msi\`)
 
 ## Build options
 
 | Command | What it does |
-|---------|-------------|
+| ------- | ----------- |
 | `./gradlew run` | Run in dev mode (all platforms) |
 | `./gradlew packageDmg` | macOS `.dmg` app bundle |
 | `./gradlew packageMsi` | Windows `.msi` installer |

@@ -22,7 +22,7 @@ echo "Installed icon to $ICON_FILE"
 if [ -n "${1:-}" ] && [ -f "$1" ]; then
     EXEC_CMD="java -jar $1"
 else
-    EXEC_CMD="bash -c 'cd $SCRIPT_DIR && JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew run'"
+    EXEC_CMD="bash -c 'cd $SCRIPT_DIR && ./gradlew run'"
 fi
 
 # Write desktop entry
