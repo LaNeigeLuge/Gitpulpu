@@ -20,7 +20,7 @@ DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 Compression=lzma
 OutputBaseFilename={#MyAppName}_Windows_Installer_{#MyAppVersion}
-SetupIconFile=app\build\compose\binaries\main\app\Gitpulpu\Gitpulpu.ico
+SetupIconFile=icons\icon.ico
 SolidCompression=yes
 WizardStyle=modern
 
