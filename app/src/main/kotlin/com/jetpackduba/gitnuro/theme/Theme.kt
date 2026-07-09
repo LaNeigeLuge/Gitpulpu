@@ -46,6 +46,9 @@ fun AppTheme(
     val theme = when (selectedTheme) {
         Theme.Light -> lightTheme
         Theme.Dark -> darkTheme
+        Theme.RadioactiveDreams -> radioactiveDreamsTheme
+        Theme.GenXSoftClub -> genXSoftClubTheme
+        Theme.CalderaNight -> darkTheme // same palette as Dark; adds the ember-bloom effect layer
         Theme.Custom -> customTheme ?: defaultAppTheme
     }
 
@@ -175,5 +178,8 @@ val Colors.isDark: Boolean
 val themeLists = listOf(
     DropDownOption(Theme.Light, "Light"),
     DropDownOption(Theme.Dark, "Dark"),
+    DropDownOption(Theme.RadioactiveDreams, "Radioactive Dreams"),
+    DropDownOption(Theme.GenXSoftClub, "Gen X Soft Club"),
+    DropDownOption(Theme.CalderaNight, "Caldera Night"),
     DropDownOption(Theme.Custom, "Custom"),
 )

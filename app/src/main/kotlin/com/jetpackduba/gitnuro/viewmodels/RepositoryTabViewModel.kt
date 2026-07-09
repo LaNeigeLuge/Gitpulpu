@@ -261,4 +261,15 @@ class RepositoryTabViewModel @AssistedInject constructor(
             }
         }
     }
+
+    init {
+        // Record every successfully opened repository in the recent list. This is the single point
+        // all open paths funnel through (picker, startup, discovered, clone), so recents stay accurate.
+        repositorySelectionState
+            .filterIsInstance<RepositorySelectionState.Open>()
+            .map { it.path.removeGitSuffix() }
+            .distinctUntilChanged()
+            .onEach { appStateManager.repositoryTabChanged(it) }
+            .launchIn(viewModelScope)
+    }
 }

@@ -72,6 +72,121 @@ val lightTheme = ColorsScheme(
 )
 
 
+// ── "Radioactive Dreams" palette ────────────────────────────────────────────
+// A screencapture from a lost PS1 game rendered in Bryce 3D: a toxic swamp world
+// drowned in nuclear haze. Phosphor-green UI glowing off a green-black CRT void,
+// with chromatic-aberration magenta + cyan bleeding at the edges like a glitched
+// PSX framebuffer. Low-bit murk, dithered depth, radioactive dream logic.
+private val VoidMurk      = Color(0xFF050A07)    // deepest bg — green-black CRT void
+private val SwampSurface  = Color(0xFF0B1610)    // panels, sidebar — submerged murk
+private val SwampElevated = Color(0xFF11211A)    // toolbar, elevated surfaces
+private val ReactorTint   = Color(0xFF16281D)    // green-lit accent surface
+private val OozeSelection = Color(0xFF2A1030)    // selection — glitch magenta-purple bleed
+private val ToxicHaze     = Color(0xFF0A1E16)    // gradient end — radioactive sky haze
+
+private val ReactorCore   = Color(0xFF2BFF88)    // nuclear green — primary phosphor accent
+private val ReactorGlow   = Color(0xFF7CFFB0)    // lighter green — accent text on dark
+private val UraniumAcid   = Color(0xFFB6FF3C)    // acid yellow-green — modified files
+private val GlitchMagenta = Color(0xFFFF2D95)    // chromatic magenta — deleted / secondary
+private val GlitchRed     = Color(0xFFFF2D5A)    // hot glitch red — error / abort
+private val PsxCyan       = Color(0xFF23E0FF)    // chromatic cyan — keywords
+private val HazmatAmber   = Color(0xFFFFC53D)    // caution yellow — conflicts
+
+private val PhosphorText  = Color(0xFFC8FFD8)    // phosphorescent screen text
+private val PhosphorDim   = Color(0xFF6E9E80)    // muted swamp-green secondary text
+
+val radioactiveDreamsTheme = ColorsScheme(
+    primary = ReactorCore,
+    primaryVariant = ReactorGlow,
+    onPrimary = VoidMurk,                          // dark text on bright nuclear green
+    secondary = GlitchMagenta,
+    onSecondary = VoidMurk,
+    onBackground = PhosphorText,
+    onBackgroundSecondary = PhosphorDim,
+    error = GlitchRed,
+    onError = VoidMurk,
+    background = VoidMurk,
+    backgroundSelected = OozeSelection,
+    surface = SwampSurface,
+    secondarySurface = SwampElevated,
+    tertiarySurface = ReactorTint,
+    addFile = ReactorCore,
+    deletedFile = GlitchMagenta,
+    modifiedFile = UraniumAcid,
+    conflictingFile = HazmatAmber,
+    dialogOverlay = Color(0xCC02060A),             // deep toxic dim
+    normalScrollbar = Color(0xFF1E3A2A),           // dark swamp scrollbar
+    hoverScrollbar = ReactorCore,
+    diffLineAdded = Color(0xAA103322),             // dark radioactive-green wash
+    diffContentAdded = Color(0x552BFF88),          // nuclear green inline
+    diffLineRemoved = Color(0xAA331028),           // dark glitch-magenta wash
+    diffContentRemoved = Color(0x55FF2D95),        // magenta inline
+    diffKeyword = PsxCyan,                          // chromatic cyan keywords
+    diffAnnotation = HazmatAmber,                   // hazard-yellow numbers
+    diffComment = PhosphorDim,                       // dim swamp comments
+    backgroundGradientEnd = ToxicHaze,              // vertical radioactive haze
+    isLight = false,
+)
+
+
+// ── "Gen X Soft Club" palette ────────────────────────────────────────────────
+// A late-night 1990s nightclub shot on expired 35mm: a dim warm-smoke room, velvet
+// and chrome surfaces, soft diffused neon in dusty teal, mauve and amber bleeding
+// through hazy air. Low contrast, desaturated, faded warmth — wistful glamour, not
+// bright modern club energy. Softness over sharpness; nothing is neon-hard here.
+private val SmokeRoom     = Color(0xFF191620)    // dim warm-smoke bg — the dark room
+private val VelvetPanel   = Color(0xFF221E2A)    // panels, sidebar — worn velvet
+private val ChromeDusk    = Color(0xFF2A2532)    // toolbar, elevated — dusty chrome
+private val AmberBooth    = Color(0xFF2C2822)    // amber-lit accent surface
+private val NeonHalo      = Color(0xFF2E2838)    // selection — soft mauve glow
+private val FloorHaze     = Color(0xFF1F2329)    // gradient end — cool neon floor-haze
+
+private val FadedTeal     = Color(0xFF6DB3AB)    // dusty teal neon — primary accent
+private val TealBloom     = Color(0xFF8FC9C1)    // lighter teal — accent text on dark
+private val DustyMauve    = Color(0xFFBC8FB2)    // dusty rose/mauve neon — secondary
+private val MutedAmber    = Color(0xFFD6A868)    // muted amber neon — modified/highlight
+private val SageTeal      = Color(0xFF83B8A0)    // soft sage-teal — added
+private val FadedRose     = Color(0xFFCF8794)    // faded rose — deleted / error
+private val DuskyOrange   = Color(0xFFCE9463)    // dusky orange — conflict
+private val LavenderInk   = Color(0xFFAF9BC9)    // soft lavender — keywords
+
+private val FadedCream    = Color(0xFFDED4C6)    // warm faded-film text (low contrast)
+private val SmokeGray     = Color(0xFF928A94)    // dusty mauve-gray — secondary text
+
+val genXSoftClubTheme = ColorsScheme(
+    primary = FadedTeal,
+    primaryVariant = TealBloom,
+    onPrimary = SmokeRoom,                         // dark text on soft teal
+    secondary = DustyMauve,
+    onSecondary = SmokeRoom,
+    onBackground = FadedCream,
+    onBackgroundSecondary = SmokeGray,
+    error = FadedRose,
+    onError = SmokeRoom,
+    background = SmokeRoom,
+    backgroundSelected = NeonHalo,
+    surface = VelvetPanel,
+    secondarySurface = ChromeDusk,
+    tertiarySurface = AmberBooth,
+    addFile = SageTeal,
+    deletedFile = FadedRose,
+    modifiedFile = MutedAmber,
+    conflictingFile = DuskyOrange,
+    dialogOverlay = Color(0xAA141019),             // warm smoke haze, not hard black
+    normalScrollbar = Color(0xFF3A3440),           // dusty velvet scrollbar
+    hoverScrollbar = FadedTeal,
+    diffLineAdded = Color(0x552E4A46),             // soft dark-teal wash
+    diffContentAdded = Color(0x4483B8A0),          // sage-teal inline
+    diffLineRemoved = Color(0x554A3236),           // soft dark-rose wash
+    diffContentRemoved = Color(0x44CF8794),        // faded-rose inline
+    diffKeyword = LavenderInk,                      // soft lavender keywords
+    diffAnnotation = Color(0xFFC9A56B),             // muted amber numbers
+    diffComment = Color(0xFF7E8A82),                 // quiet smoke-green comments
+    backgroundGradientEnd = FloorHaze,              // gentle vertical neon haze
+    isLight = false,
+)
+
+
 val darkTheme = ColorsScheme(
     primary = CitraOrange,
     primaryVariant = Color(0xFFFF8A50),             // lighter orange for text on dark bg

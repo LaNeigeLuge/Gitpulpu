@@ -55,7 +55,10 @@ import com.jetpackduba.gitnuro.keybindings.KeybindingOption
 import com.jetpackduba.gitnuro.keybindings.matchesBinding
 import com.jetpackduba.gitnuro.lfs.AppLfsFactory
 import com.jetpackduba.gitnuro.managers.AppStateManager
+import androidx.compose.foundation.layout.fillMaxSize
 import com.jetpackduba.gitnuro.theme.AppTheme
+import com.jetpackduba.gitnuro.theme.CalderaNightEffects
+import com.jetpackduba.gitnuro.theme.GenXSoftClubEffects
 import com.jetpackduba.gitnuro.theme.ColorsScheme
 import com.jetpackduba.gitnuro.theme.onBackgroundSecondary
 import com.jetpackduba.gitnuro.ui.AppTab
@@ -266,7 +269,11 @@ class App @Inject constructor(
                         linesHeightType = linesHeightType,
                     ) {
                         Box(modifier = Modifier.background(MaterialTheme.colors.background)) {
-                            AppTabs()
+                            when (theme) {
+                                Theme.GenXSoftClub -> GenXSoftClubEffects(Modifier.fillMaxSize()) { AppTabs() }
+                                Theme.CalderaNight -> CalderaNightEffects(Modifier.fillMaxSize()) { AppTabs() }
+                                else -> AppTabs()
+                            }
                         }
                     }
                 }
