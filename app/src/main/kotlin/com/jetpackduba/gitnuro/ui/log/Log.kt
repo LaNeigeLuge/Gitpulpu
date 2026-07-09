@@ -190,7 +190,7 @@ private fun LogView(
     val horizontalScrollState = logState.horizontalScrollState
     val searchFilterValue = logState.searchFilter
 
-    LaunchedEffect(verticalScrollState) {
+    LaunchedEffect(verticalScrollState, logState) {
         snapshotFlow { verticalScrollState.firstVisibleItemIndex }
             .distinctUntilChanged()
             .collect {
@@ -313,7 +313,7 @@ private fun LogView(
                 adapter = rememberScrollbarAdapter(horizontalScrollState)
             )
 
-            val isFirstItemVisible by remember {
+            val isFirstItemVisible by remember(verticalScrollState) {
                 derivedStateOf { verticalScrollState.firstVisibleItemIndex > 0 }
             }
 
