@@ -32,7 +32,6 @@ import javax.inject.Singleton
 
 private const val TAG = "SettingsViewModel"
 
-@Singleton
 class SettingsViewModel @Inject constructor(
     private val appSettingsService: AppSettingsService,
     private val openFilePickerGitAction: OpenFilePickerGitAction,
@@ -45,7 +44,7 @@ class SettingsViewModel @Inject constructor(
     fun onAction(action: SettingsAction) {
         when (action) {
             is SettingsAction.SetConfig -> setAppConfiguration(action.configuration)
-            SettingsAction.OpenLogsFolder -> TODO() // TODO implement this
+            SettingsAction.OpenLogsFolder -> openLogsFolderInFileExplorer()
         }
     }
 
@@ -117,8 +116,6 @@ class SettingsViewModel @Inject constructor(
             verifySsl,
             cacheCredentialsInMemory,
             terminalPath ->
-
-            println("Settings combine updated")
 
             SettingsViewState(
                 scaleUi,
