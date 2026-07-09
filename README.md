@@ -15,6 +15,18 @@ Fork of [Gitnuro](https://github.com/JetpackDuba/Gitnuro) with a redesigned UI, 
 
 ## Install
 
+### Download
+
+Prebuilt binaries are available on the [Releases](https://github.com/LaNeigeLuge/Gitpulpu/releases) page:
+
+- **Linux** — JAR for x86_64 or aarch64. Requires Java 21+: `java -jar Gitpulpu-linux-x86_64-*.jar`
+- **Windows** — installer (`.exe`) or portable ZIP. No Java required.
+- **macOS** — ZIP with the app bundle. No Java required.
+
+SHA256 checksums (`.sum`) are published next to each file.
+
+## Build from source
+
 ### Requirements
 
 - **JDK 17+** — [Adoptium](https://adoptium.net/) or your OS package manager. Gradle downloads the JDK 21 toolchain used for compilation automatically.
