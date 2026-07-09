@@ -63,10 +63,16 @@ fun WelcomePage(
     onShowSettings: () -> Unit,
 ) {
     val recentlyOpenedRepositories by repositoryTabViewModel.appStateManager.latestOpenedRepositoriesPaths.collectAsState()
+    val discoveredRepositories by repositoryTabViewModel.discoveredRepositories.collectAsState()
     val newUpdate by repositoryTabViewModel.update.collectAsState()
+
+    LaunchedEffect(Unit) {
+        repositoryTabViewModel.scanForRepositories()
+    }
 
     WelcomeView(
         recentlyOpenedRepositories,
+        discoveredRepositories,
         newUpdate,
         onShowCloneDialog = onShowCloneDialog,
         onShowSettings = onShowSettings,
@@ -102,6 +108,7 @@ fun WelcomeViewPreview() {
         }
         WelcomeView(
             recentlyOpenedRepositories = recentRepositories,
+            discoveredRepositories = emptyList(),
             newUpdate = null,
             onShowCloneDialog = {},
             onShowSettings = {},
@@ -117,6 +124,7 @@ fun WelcomeViewPreview() {
 @Composable
 fun WelcomeView(
     recentlyOpenedRepositories: List<String>,
+    discoveredRepositories: List<String>,
     newUpdate: Update?,
     onShowCloneDialog: () -> Unit,
     onShowSettings: () -> Unit,
@@ -129,6 +137,7 @@ fun WelcomeView(
 
     var showAdditionalInfo by remember { mutableStateOf(false) }
     val searchFocusRequester = remember { FocusRequester() }
+    val discoveredSearchFocusRequester = remember { FocusRequester() }
     val welcomeViewFocusRequester = remember { FocusRequester() }
 
     Column(
@@ -186,13 +195,42 @@ fun WelcomeView(
                     onOpenUrlInBrowser = onOpenUrlInBrowser,
                 )
 
-                RecentRepositories(
-                    recentlyOpenedRepositories,
-                    canRepositoriesBeRemoved = true,
-                    onOpenKnownRepository = onOpenKnownRepository,
-                    onRemoveRepositoryFromRecent = onRemoveRepositoryFromRecent,
-                    searchFieldFocusRequester = searchFocusRequester,
-                )
+                Column(
+                    modifier = Modifier.padding(start = 32.dp).width(600.dp).height(500.dp),
+                ) {
+                    Text(
+                        text = stringResource(Res.string.home_recent_repositories_title),
+                        style = MaterialTheme.typography.h3,
+                        modifier = Modifier.padding(bottom = 4.dp),
+                    )
+
+                    RecentRepositories(
+                        recentlyOpenedRepositories,
+                        canRepositoriesBeRemoved = true,
+                        onOpenKnownRepository = onOpenKnownRepository,
+                        onRemoveRepositoryFromRecent = onRemoveRepositoryFromRecent,
+                        searchFieldFocusRequester = searchFocusRequester,
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                    )
+
+                    if (discoveredRepositories.isNotEmpty()) {
+                        Text(
+                            text = stringResource(Res.string.home_discovered_repositories_title),
+                            style = MaterialTheme.typography.h3,
+                            modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
+                        )
+
+                        RecentRepositories(
+                            discoveredRepositories,
+                            canRepositoriesBeRemoved = false,
+                            onOpenKnownRepository = onOpenKnownRepository,
+                            onRemoveRepositoryFromRecent = {},
+                            searchFieldFocusRequester = discoveredSearchFocusRequester,
+                            modifier = Modifier.fillMaxWidth().weight(2f),
+                            searchHint = stringResource(Res.string.home_discovered_repositories_search_label),
+                        )
+                    }
+                }
             }
         }
 
@@ -299,16 +337,19 @@ fun RecentRepositories(
     onRemoveRepositoryFromRecent: (String) -> Unit,
     onOpenKnownRepository: (String) -> Unit,
     searchFieldFocusRequester: FocusRequester,
+    modifier: Modifier = Modifier
+        .padding(start = 32.dp)
+        .width(600.dp)
+        .height(400.dp),
+    searchHint: String = stringResource(Res.string.home_recent_repositories_search_label),
+    emptyText: String = stringResource(Res.string.home_recent_repositories_list_empty),
 ) {
     Column(
-        modifier = Modifier
-            .padding(start = 32.dp)
-            .width(600.dp)
-            .height(400.dp),
+        modifier = modifier,
     ) {
         if (recentlyOpenedRepositories.isEmpty()) {
             Text(
-                stringResource(Res.string.home_recent_repositories_list_empty),
+                emptyText,
                 color = MaterialTheme.colors.onBackgroundSecondary,
                 style = MaterialTheme.typography.body1,
                 modifier = Modifier.padding(top = 16.dp)
@@ -320,6 +361,7 @@ fun RecentRepositories(
                 onRemoveRepositoryFromRecent = onRemoveRepositoryFromRecent,
                 onOpenKnownRepository = onOpenKnownRepository,
                 searchFieldFocusRequester = searchFieldFocusRequester,
+                searchHint = searchHint,
             )
         }
     }
@@ -333,6 +375,7 @@ fun RecentRepositoriesList(
     onRemoveRepositoryFromRecent: (String) -> Unit,
     onOpenKnownRepository: (String) -> Unit,
     onExitClicked: () -> Unit = {},
+    searchHint: String = stringResource(Res.string.home_recent_repositories_search_label),
 ) {
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -414,7 +457,7 @@ fun RecentRepositoriesList(
             value = filter,
             onValueChange = { filter = it },
             singleLine = true,
-            hint = stringResource(Res.string.home_recent_repositories_search_label),
+            hint = searchHint,
             trailingIcon = {
                 if (filter.isNotEmpty()) {
                     IconButton(

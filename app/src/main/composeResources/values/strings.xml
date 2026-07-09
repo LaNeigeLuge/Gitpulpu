@@ -20,6 +20,9 @@
     <string name="home_recent_repositories_search_label">Search for recent repositories</string>
     <string name="home_recent_repositories_list_empty">Nothing to see here, open a repository first!</string>
     <string name="home_recent_repositories_remove_repository">Remove repository from recent</string>
+    <string name="home_recent_repositories_title">Recent repositories</string>
+    <string name="home_discovered_repositories_title">Discovered on this computer</string>
+    <string name="home_discovered_repositories_search_label">Search discovered repositories</string>
 
     <!-- Top menu -->
     <string name="menu_open">Open</string>

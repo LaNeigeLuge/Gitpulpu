@@ -20,6 +20,7 @@ import com.jetpackduba.gitnuro.domain.repositories.FailureSeverity
 import com.jetpackduba.gitnuro.domain.repositories.RepositoryDataRepository
 import com.jetpackduba.gitnuro.domain.repositories.RepositoryStateRepository
 import com.jetpackduba.gitnuro.domain.usecases.OpenRepositoryUseCase
+import com.jetpackduba.gitnuro.domain.usecases.ScanRepositoriesUseCase
 import com.jetpackduba.gitnuro.domain.usecases.SetRepositorySelectionStateToNoneUseCase
 import com.jetpackduba.gitnuro.extensions.stateIn
 import com.jetpackduba.gitnuro.managers.AppStateManager
@@ -63,6 +64,7 @@ class RepositoryTabViewModel @AssistedInject constructor(
     private val repositoryDataRepository: RepositoryDataRepository,
     private val repositoryStateRepository: RepositoryStateRepository,
     private val setRepositorySelectionStateToNoneUseCase: SetRepositorySelectionStateToNoneUseCase,
+    private val scanRepositoriesUseCase: ScanRepositoriesUseCase,
     private val tabComponent: TabComponent,
     @Assisted private val initialPath: String?,
     updatesRepository: UpdatesRepository,
@@ -175,6 +177,17 @@ class RepositoryTabViewModel @AssistedInject constructor(
             printLog(TAG, "Trying to open repository ${directory}")
 
             openRepositoryUseCase(directory)
+        }
+    }
+
+    private val _discoveredRepositories = MutableStateFlow<List<String>>(emptyList())
+    val discoveredRepositories = _discoveredRepositories.asStateFlow()
+
+    fun scanForRepositories() {
+        viewModelScope.launch {
+            val alreadyKnown = appStateManager.latestOpenedRepositoriesPaths.value.toSet()
+            _discoveredRepositories.value = scanRepositoriesUseCase()
+                .filter { it !in alreadyKnown }
         }
     }
 
