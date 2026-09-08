@@ -400,6 +400,7 @@ fun TaskType.errorTitle(): String {
         TaskType.CreateTag -> "Create tag failed"
         TaskType.CheckoutTag -> "Could not checkout tag's commit"
         TaskType.DeleteTag -> "Could not delete tag"
+        TaskType.PushTag -> "Could not push tag"
         TaskType.AddSubmodule -> "Add submodule failed"
         TaskType.DeleteSubmodule -> "Delete submodule failed"
         TaskType.InitSubmodule -> "Init submodule failed"

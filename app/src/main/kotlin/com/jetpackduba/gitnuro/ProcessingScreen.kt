@@ -86,6 +86,7 @@ fun getTitle(taskType: TaskType): String {
         TaskType.DeleteStash -> "Deleting stash"
         TaskType.DeleteSubmodule -> "Deleting submodule"
         TaskType.DeleteTag -> "Deleting tag"
+        TaskType.PushTag -> "Pushing tag"
         TaskType.DiscardFile -> "Discarding file"
         TaskType.DoCommit -> "Committing"
         TaskType.Fetch -> "Fetching"

@@ -564,6 +564,7 @@ fun CommitsList(
                 onDeleteRemoteBranch = { onAction(LogAction.DeleteRemoteBranch(it)) },
                 onCheckoutTag = { onAction(LogAction.CheckoutTag(it)) },
                 onDeleteTag = { onAction(LogAction.DeleteTag(it)) },
+                onPushTag = { onAction(LogAction.PushTag(it)) },
                 onPushToRemoteBranch = { onAction(LogAction.PushToRemoteBranch(it)) },
                 onPullFromRemoteBranch = { onAction(LogAction.PullFromRemoteBranch(it)) },
                 onRebaseBranch = { onAction(LogAction.Rebase(it)) },
@@ -776,6 +777,7 @@ private fun CommitLine(
     onDeleteRemoteBranch: (Branch) -> Unit,
     onCheckoutTag: (Tag) -> Unit,
     onDeleteTag: (Tag) -> Unit,
+    onPushTag: (Tag) -> Unit,
     onPushToRemoteBranch: (Branch) -> Unit,
     onPullFromRemoteBranch: (Branch) -> Unit,
     onRebaseBranch: (Branch) -> Unit,
@@ -904,6 +906,7 @@ private fun CommitLine(
                         onDeleteRemoteBranch = onDeleteRemoteBranch,
                         onCheckoutTag = onCheckoutTag,
                         onDeleteTag = onDeleteTag,
+                        onPushTag = onPushTag,
                         onRebaseBranch = onRebaseBranch,
                         onPushRemoteBranch = onPushToRemoteBranch,
                         onPullRemoteBranch = onPullFromRemoteBranch,
@@ -933,6 +936,7 @@ fun CommitMessage(
     onRebaseBranch: (ref: Branch) -> Unit,
     onCheckoutTag: (tag: Tag) -> Unit,
     onDeleteTag: (tag: Tag) -> Unit,
+    onPushTag: (tag: Tag) -> Unit,
     onPushRemoteBranch: (ref: Branch) -> Unit,
     onPullRemoteBranch: (ref: Branch) -> Unit,
     onChangeDefaultUpstreamBranch: (ref: Branch) -> Unit,
@@ -958,6 +962,7 @@ fun CommitMessage(
                         // Distinct release color so tags stand apart from branch chips
                         color = MaterialTheme.colors.secondary,
                         onCheckoutTag = { onCheckoutTag(tag) },
+                        onPushTag = { onPushTag(tag) },
                         onDeleteTag = { onDeleteTag(tag) },
                     )
                 }
@@ -1421,12 +1426,14 @@ fun TagChip(
     modifier: Modifier = Modifier,
     tag: Tag,
     onCheckoutTag: () -> Unit,
+    onPushTag: () -> Unit,
     onDeleteTag: () -> Unit,
     color: Color,
 ) {
     val contextMenuItemsList = {
         tagContextMenuItems(
             onCheckoutTag = onCheckoutTag,
+            onPushTag = onPushTag,
             onDeleteTag = onDeleteTag,
         )
     }

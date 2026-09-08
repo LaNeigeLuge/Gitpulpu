@@ -114,6 +114,7 @@ class RepositoryOpenViewModel @Inject constructor(
     private val pullBranchUseCase: PullBranchUseCase,
     private val initializeSubmoduleUseCase: InitializeSubmoduleUseCase,
     private val deleteTagUseCase: DeleteTagUseCase,
+    private val pushTagUseCase: PushTagUseCase,
     private val applyStashUseCase: ApplyStashUseCase,
     private val popStashUseCase: PopStashUseCase,
     private val deleteStashUseCase: DeleteStashUseCase,
@@ -512,6 +513,8 @@ class RepositoryOpenViewModel @Inject constructor(
     fun pullFromRemoteBranch(branch: Branch) = pullBranchUseCase(PullType.DEFAULT, branch)
 
     fun deleteTag(tag: Tag) = deleteTagUseCase(tag)
+
+    fun pushTag(tag: Tag) = pushTagUseCase(tag)
     fun selectStash(stash: Commit) {
         selectCommit(stash)
     }
@@ -714,6 +717,7 @@ class RepositoryOpenViewModel @Inject constructor(
             is LogAction.DeleteRemoteBranch -> deleteRemoteBranch(action.branch)
             is LogAction.DeleteStash -> deleteStash(action.commit)
             is LogAction.DeleteTag -> deleteTag(action.tag)
+            is LogAction.PushTag -> pushTag(action.tag)
             is LogAction.Merge -> mergeBranch(action.branch)
             is LogAction.PopStash -> popStash(action.commit)
             is LogAction.PullFromRemoteBranch -> pullFromRemoteBranch(action.branch)

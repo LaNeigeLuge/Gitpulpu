@@ -272,6 +272,9 @@ interface GitActionsModule {
     fun bindsPullBranchGitAction(action: PullBranchGitAction): IPullBranchGitAction
 
     @Binds
+    fun bindsPushTagGitAction(action: PushTagGitAction): IPushTagGitAction
+
+    @Binds
     fun bindsPushBranchGitAction(action: PushBranchGitAction): IPushBranchGitAction
 
     @Binds

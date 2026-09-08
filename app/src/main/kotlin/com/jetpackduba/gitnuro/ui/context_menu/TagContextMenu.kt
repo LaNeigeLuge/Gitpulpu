@@ -10,6 +10,7 @@ import org.jetbrains.compose.resources.stringResource
 
 fun tagContextMenuItems(
     onCheckoutTag: () -> Unit,
+    onPushTag: () -> Unit,
     onDeleteTag: () -> Unit,
 ): List<ContextMenuElement> {
     return mutableListOf(
@@ -17,6 +18,11 @@ fun tagContextMenuItems(
             composableLabel = { stringResource(Res.string.tag_context_menu_checkout_tag_commit) },
             icon = { painterResource(Res.drawable.start) },
             onClick = onCheckoutTag
+        ),
+        ContextMenuElement.ContextTextEntry(
+            composableLabel = { stringResource(Res.string.tag_context_menu_push_tag) },
+            icon = { painterResource(Res.drawable.upload) },
+            onClick = onPushTag
         ),
         ContextMenuElement.ContextTextEntry(
             composableLabel = { stringResource(Res.string.tag_context_menu_delete_tag) },

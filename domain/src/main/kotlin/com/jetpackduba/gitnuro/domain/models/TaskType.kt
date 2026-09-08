@@ -46,6 +46,7 @@ sealed interface TaskType {
     data object CreateTag : TaskType
     data object CheckoutTag : TaskType
     data object DeleteTag : TaskType
+    data object PushTag : TaskType
     data object AddSubmodule : TaskType
     data object DeleteSubmodule : TaskType
     data object InitSubmodule : TaskType

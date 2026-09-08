@@ -6,6 +6,7 @@ import com.jetpackduba.gitnuro.data.git.branches.SetTrackingBranchGitAction
 import com.jetpackduba.gitnuro.domain.BranchesConstants
 import com.jetpackduba.gitnuro.domain.credentials.CredentialsHandler
 import com.jetpackduba.gitnuro.domain.errors.bind
+import com.jetpackduba.gitnuro.domain.interfaces.IHandleTransportGitAction
 import com.jetpackduba.gitnuro.domain.interfaces.IPushBranchGitAction
 import com.jetpackduba.gitnuro.domain.models.Branch
 import com.jetpackduba.gitnuro.domain.models.TrackingBranch
@@ -23,7 +24,7 @@ import javax.inject.Inject
 import kotlin.math.max
 
 class PushBranchGitAction @Inject constructor(
-    private val handleTransportGitAction: HandleTransportGitAction,
+    private val handleTransportGitAction: IHandleTransportGitAction,
     private val getTrackingBranchGitAction: GetTrackingBranchGitAction,
     private val setTrackingBranchGitAction: SetTrackingBranchGitAction,
     private val jgit: JGit,
@@ -109,7 +110,9 @@ class PushBranchGitAction @Inject constructor(
                 return@run this
             }
             .run {
-                if (pushTags) {
+                // setForce applies to every refspec, so adding the tags refspec to a force push
+                // would force-update remote tags too. Branch history is the only thing force is for.
+                if (pushTags && !force) {
                     setPushTags()
                 } else {
                     this
