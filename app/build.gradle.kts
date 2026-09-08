@@ -161,6 +161,12 @@ compose.desktop {
             }
 
             macOS {
+                // A macOS bundle version must start with a number greater than zero, so a 0.x
+                // release cannot be expressed as-is and jpackage fails. Promote the leading zero:
+                // 0.2.0 -> 1.2.0, which stays monotonic across the 0.x line. The app itself keeps
+                // reporting AppConstants.APP_VERSION.
+                packageVersion = projectVersionSimplified.replaceFirst(Regex("^0\\."), "1.")
+
                 jvmArgs(
                     "-Dapple.awt.application.appearance=system"
                 )

@@ -137,6 +137,15 @@ jobs:
       - name: Build distributable
         run: ./gradlew createDistributable
 
+      - name: Show jpackage logs
+        if: failure()
+        shell: bash
+        run: |
+          for f in app/build/compose/logs/*/*.txt; do
+            echo "=== $f ==="
+            cat "$f"
+          done
+
       - name: Compile installer
         uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
         with:
@@ -197,6 +206,15 @@ jobs:
 
       - name: Build distributable
         run: ./gradlew createDistributable
+
+      - name: Show jpackage logs
+        if: failure()
+        shell: bash
+        run: |
+          for f in app/build/compose/logs/*/*.txt; do
+            echo "=== $f ==="
+            cat "$f"
+          done
 
       - name: Create macOS ZIP
         run: |
