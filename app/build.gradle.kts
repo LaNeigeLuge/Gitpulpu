@@ -19,12 +19,12 @@ val linuxArmTarget = "aarch64-unknown-linux-gnu"
 val linuxX64Target = "x86_64-unknown-linux-gnu"
 
 // Remember to update Constants.APP_VERSION when changing this version
-val projectVersion = "1.5.0"
+val projectVersion = "0.2.0"
 
 val projectName = "Gitpulpu"
 
 // Required for JPackage, as it doesn't accept additional suffixes after the version.
-val projectVersionSimplified = "1.5.0"
+val projectVersionSimplified = "0.2.0"
 
 val rustGeneratedSource = "${layout.buildDirectory.get()}/generated/source/uniffi/main/com/jetpackduba/gitnuro/java"
 
@@ -179,6 +179,7 @@ tasks.register("fatJarLinux", type = Jar::class) {
     }
 
     archiveBaseName.set("$projectName-linux-$archSuffix-$projectVersion")
+    archiveVersion.set("") // the version is already in the base name, Gradle would append it twice
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     manifest {
