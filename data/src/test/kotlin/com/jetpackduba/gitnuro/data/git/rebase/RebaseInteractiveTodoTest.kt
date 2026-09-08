@@ -73,6 +73,40 @@ class RebaseInteractiveTodoTest {
         Unit
     }
 
+    @Test
+    fun `continue on a rebase awaiting its plan applies the todo instead of failing`() = runBlocking {
+        startInteractiveRebaseOntoBase()
+
+        // Awaiting interaction: the todo exists but nothing has been applied yet, so there is no "done"
+        assertTrue(!File(git.repository.directory, "rebase-merge/done").exists())
+
+        val result = ContinueRebaseGitAction(jgit)(repoDir.absolutePath)
+        assertTrue(result is Either.Ok, "continue should apply the plan: $result")
+
+        assertEquals(org.eclipse.jgit.lib.RepositoryState.SAFE, git.repository.repositoryState)
+        assertEquals(
+            listOf("third", "second", "first", "base"),
+            git.log().call().map { it.fullMessage.trim() },
+        )
+    }
+
+    private suspend fun startInteractiveRebaseOntoBase() {
+        val base = git.log().call().toList().last { it.fullMessage.trim() == "base" }
+
+        val startResult = StartRebaseInteractiveGitAction(jgit)(
+            repoDir.absolutePath,
+            com.jetpackduba.gitnuro.domain.models.Commit(
+                hash = base.name,
+                message = "base",
+                committer = com.jetpackduba.gitnuro.domain.models.Identity("t", "t@t"),
+                author = com.jetpackduba.gitnuro.domain.models.Identity("t", "t@t"),
+                date = 0,
+                parentsHashes = emptyList(),
+            ),
+        )
+        assertTrue(startResult is Either.Ok, "start rebase should succeed: $startResult")
+    }
+
     private fun commit(message: String, content: String) {
         File(repoDir, "f.txt").appendText(content)
         git.add().addFilepattern(".").call()
