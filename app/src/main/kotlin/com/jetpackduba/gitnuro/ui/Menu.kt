@@ -404,7 +404,7 @@ fun KeybindingHintPart(part: String) {
     Text(
         text = part,
         fontWeight = FontWeight.Medium,
-        color = MaterialTheme.colors.primary,
+        color = MaterialTheme.colors.primaryVariant,
         modifier = Modifier
             .clip(AppShapes.small)
             .border(2.dp, MaterialTheme.colors.primary, AppShapes.small)

@@ -18,6 +18,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.background
+import com.jetpackduba.gitnuro.theme.rowWashAlpha
 import com.jetpackduba.gitnuro.extensions.backgroundIf
 import com.jetpackduba.gitnuro.extensions.handMouseClickable
 import com.jetpackduba.gitnuro.extensions.onDoubleClick
@@ -92,6 +94,8 @@ fun FileEntry(
                 modifier = Modifier
                     .height(MaterialTheme.linesHeight.fileHeight)
                     .fillMaxWidth()
+                    // status wash under the row; the filename stays onBackground on top of it
+                    .background(iconColor.copy(alpha = MaterialTheme.rowWashAlpha))
                     .backgroundIf(isSelected, MaterialTheme.colors.backgroundSelected)
                     .padding(start = (TREE_START_PADDING * depth).dp),
                 verticalAlignment = Alignment.CenterVertically,

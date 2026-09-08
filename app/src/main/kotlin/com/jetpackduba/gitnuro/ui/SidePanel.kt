@@ -31,6 +31,7 @@ import com.jetpackduba.gitnuro.domain.models.ui.SelectedItem
 import com.jetpackduba.gitnuro.extensions.handOnHover
 import com.jetpackduba.gitnuro.extensions.setClipboardText
 import com.jetpackduba.gitnuro.repositoryopen.RepositoryOpenViewModel
+import com.jetpackduba.gitnuro.theme.watermarkTint
 import com.jetpackduba.gitnuro.theme.onBackgroundSecondary
 import com.jetpackduba.gitnuro.ui.components.AdjustableOutlinedTextField
 import com.jetpackduba.gitnuro.ui.components.ScrollableLazyColumn
@@ -95,7 +96,7 @@ fun SidePanel(
                     .size(180.dp)
                     .align(Alignment.BottomCenter)
                     .offset(y = 20.dp),
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground.copy(alpha = 0.04f)),
+                colorFilter = ColorFilter.tint(MaterialTheme.watermarkTint),
             )
 
             ScrollableLazyColumn(

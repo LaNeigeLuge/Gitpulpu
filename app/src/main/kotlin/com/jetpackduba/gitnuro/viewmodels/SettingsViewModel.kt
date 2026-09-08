@@ -150,7 +150,7 @@ class SettingsViewModel @Inject constructor(
     private fun emptySettingsState(): SettingsViewState {
         return SettingsViewState(
             scaleUi = null,
-            theme = Theme.Light,
+            theme = Theme.CalderaNight,
             customTheme = "",
             linesHeightType = LinesHeightType.SPACED,
             dateFormatUseDefault = false,

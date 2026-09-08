@@ -3,7 +3,9 @@
 A multiplatform Git client built with Jetpack Compose Desktop and JGit.
 Fork of [Gitnuro](https://github.com/JetpackDuba/Gitnuro) with a redesigned UI, smarter error handling, and quality-of-life improvements.
 
-![Gitpulpu](icons/gitpulpu%20look.png)
+<video src="https://github.com/LaNeigeLuge/Gitpulpu/raw/main/gitpulpu_demo.mp4" controls width="100%"></video>
+
+If the player doesn't load, [watch the demo](gitpulpu_demo.mp4).
 
 ## What's different from Gitnuro
 

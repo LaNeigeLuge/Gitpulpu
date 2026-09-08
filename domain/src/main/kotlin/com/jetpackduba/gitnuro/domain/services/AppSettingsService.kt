@@ -48,7 +48,7 @@ class AppSettingsService @Inject constructor(
     val terminalPath: Flow<String?> get() = appSettingsRepository.terminalPath
 
     companion object {
-        val DEFAULT_THEME = Theme.Dark
+        val DEFAULT_THEME = Theme.CalderaNight
         val DEFAULT_LINES_HEIGHT = LinesHeightType.SPACED
         const val DEFAULT_DATE_USE_DEFAULT = true
         const val DEFAULT_DATE_IS_24H = true

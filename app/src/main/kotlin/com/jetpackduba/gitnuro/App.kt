@@ -58,7 +58,7 @@ import com.jetpackduba.gitnuro.managers.AppStateManager
 import androidx.compose.foundation.layout.fillMaxSize
 import com.jetpackduba.gitnuro.theme.AppTheme
 import com.jetpackduba.gitnuro.theme.CalderaNightEffects
-import com.jetpackduba.gitnuro.theme.GenXSoftClubEffects
+import com.jetpackduba.gitnuro.theme.ClaymakersEffects
 import com.jetpackduba.gitnuro.theme.ColorsScheme
 import com.jetpackduba.gitnuro.theme.onBackgroundSecondary
 import com.jetpackduba.gitnuro.ui.AppTab
@@ -127,7 +127,7 @@ class App @Inject constructor(
         application {
             var initialized by remember { mutableStateOf(false) }
 
-            var themeInitial by remember { mutableStateOf(Theme.Dark) }
+            var themeInitial by remember { mutableStateOf(Theme.CalderaNight) }
             var customThemeInitial by remember { mutableStateOf<String?>(null) }
             var scaleInitial by remember { mutableStateOf<Float?>(null) }
             var linesHeightTypeInitial by remember { mutableStateOf(LinesHeightType.SPACED) }
@@ -270,8 +270,10 @@ class App @Inject constructor(
                     ) {
                         Box(modifier = Modifier.background(MaterialTheme.colors.background)) {
                             when (theme) {
-                                Theme.GenXSoftClub -> GenXSoftClubEffects(Modifier.fillMaxSize()) { AppTabs() }
                                 Theme.CalderaNight -> CalderaNightEffects(Modifier.fillMaxSize()) { AppTabs() }
+                                Theme.Claymakers,
+                                Theme.ClaymakersNight,
+                                -> ClaymakersEffects(Modifier.fillMaxSize()) { AppTabs() }
                                 else -> AppTabs()
                             }
                         }

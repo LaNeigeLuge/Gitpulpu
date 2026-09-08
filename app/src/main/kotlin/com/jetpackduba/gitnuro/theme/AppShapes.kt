@@ -17,13 +17,13 @@ import androidx.compose.ui.unit.dp
  */
 object AppShapes {
     /** Buttons, text fields, small interactive elements */
-    val small = RoundedCornerShape(12.dp)
+    val small = RoundedCornerShape(10.dp)
 
     /** Menus, dropdowns, tooltips, notifications */
-    val medium = RoundedCornerShape(16.dp)
+    val medium = RoundedCornerShape(18.dp)
 
     /** Dialogs, cards, large panels */
-    val large = RoundedCornerShape(24.dp)
+    val large = RoundedCornerShape(26.dp)
 
     /** Tags, badges, branch/tag labels — the Caldera house radius */
     val pill = RoundedCornerShape(40.dp)

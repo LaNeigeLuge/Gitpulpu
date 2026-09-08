@@ -22,3 +22,5 @@ src/main/resources/*gitnuro_rs*
 *.dylib
 *.dll
 *.so
+.kotlin/
+hs_err_pid*.log

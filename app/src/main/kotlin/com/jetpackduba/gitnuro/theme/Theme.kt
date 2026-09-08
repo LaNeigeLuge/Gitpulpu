@@ -14,9 +14,19 @@ import com.jetpackduba.gitnuro.domain.models.ui.Theme
 import com.jetpackduba.gitnuro.ui.dropdowns.DropDownOption
 import kotlinx.coroutines.flow.MutableStateFlow
 
-private val defaultAppTheme: ColorsScheme = darkTheme
+private val defaultAppTheme: ColorsScheme = calderaNightTheme
 private var appTheme: MutableStateFlow<ColorsScheme> = MutableStateFlow(defaultAppTheme)
 internal val LocalLinesHeight = compositionLocalOf { spacedLineHeight }
+internal val LocalGraphColors = compositionLocalOf { calderaGraphColors }
+
+/** Side-panel watermark. Needs to be *darker* than the ground to read, so it is per-theme. */
+internal val LocalWatermarkTint = compositionLocalOf { Color(0x14FFFFFF) }
+
+/**
+ * Alpha for per-status file-row washes. Claymakers carries status in the row colour with ink
+ * text on top; every other theme leaves rows flat, so 0f is the default and nothing changes.
+ */
+internal val LocalRowWashAlpha = compositionLocalOf { 0f }
 
 class LinesHeight internal constructor(
     val fileHeight: Dp,
@@ -25,30 +35,28 @@ class LinesHeight internal constructor(
 )
 
 val spacedLineHeight = LinesHeight(
-    fileHeight = 38.dp,
-    logCommitHeight = 38.dp,
-    sidePanelItemHeight = 36.dp
+    fileHeight = 46.dp,
+    logCommitHeight = 46.dp,
+    sidePanelItemHeight = 44.dp
 )
 
 val compactLineHeight = LinesHeight(
-    fileHeight = 34.dp,
-    logCommitHeight = 34.dp,
-    sidePanelItemHeight = 34.dp
+    fileHeight = 42.dp,
+    logCommitHeight = 42.dp,
+    sidePanelItemHeight = 40.dp
 )
 
 @Composable
 fun AppTheme(
-    selectedTheme: Theme = Theme.Dark,
+    selectedTheme: Theme = Theme.CalderaNight,
     linesHeightType: LinesHeightType = LinesHeightType.COMPACT,
     customTheme: ColorsScheme? = null,
     content: @Composable () -> Unit,
 ) {
     val theme = when (selectedTheme) {
-        Theme.Light -> lightTheme
-        Theme.Dark -> darkTheme
-        Theme.RadioactiveDreams -> radioactiveDreamsTheme
-        Theme.GenXSoftClub -> genXSoftClubTheme
-        Theme.CalderaNight -> darkTheme // same palette as Dark; adds the ember-bloom effect layer
+        Theme.CalderaNight -> calderaNightTheme
+        Theme.Claymakers -> claymakersTheme
+        Theme.ClaymakersNight -> claymakersNightTheme
         Theme.Custom -> customTheme ?: defaultAppTheme
     }
 
@@ -60,7 +68,24 @@ fun AppTheme(
     appTheme.value = theme
 
     val composeColors = theme.toComposeColors()
-    val compositionValues = arrayOf(LocalLinesHeight provides lineHeight)
+    val isClay = selectedTheme == Theme.Claymakers || selectedTheme == Theme.ClaymakersNight
+    val bodyFamily = if (isClay) jostFontFamily else interFontFamily
+    val laneColors = if (isClay) claymakersGraphColors else calderaGraphColors
+    // salmon, and dark enough to actually show on a light ground
+    // the watermark has to sit on the opposite side of its ground to read at all
+    val watermark = when (selectedTheme) {
+        Theme.Claymakers -> Color(0x2EC97B69)        // salmon, darker than paper
+        Theme.ClaymakersNight -> Color(0x3DE8968E)   // salmon, lighter than the night ground
+        else -> Color(0x0AFFFFFF)
+    }
+    val rowWash = if (isClay) 0.22f else 0f
+    val compositionValues = arrayOf(
+        LocalLinesHeight provides lineHeight,
+        LocalBodyFontFamily provides bodyFamily,
+        LocalGraphColors provides laneColors,
+        LocalWatermarkTint provides watermark,
+        LocalRowWashAlpha provides rowWash,
+    )
 
     val shapes = Shapes(
         small = AppShapes.small,
@@ -73,7 +98,7 @@ fun AppTheme(
             colors = composeColors,
             shapes = shapes,
             content = content,
-            typography = typography(composeColors),
+            typography = typography(composeColors, selectedTheme),
         )
     }
 
@@ -83,6 +108,24 @@ val MaterialTheme.linesHeight: LinesHeight
     @Composable
     @ReadOnlyComposable
     get() = LocalLinesHeight.current
+
+/** Commit-graph lane sequence for the active theme. */
+val MaterialTheme.graphColors: List<Color>
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalGraphColors.current
+
+/** Tint for the side-panel watermark. */
+val MaterialTheme.watermarkTint: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalWatermarkTint.current
+
+/** Per-status file-row wash alpha. 0f means flat rows. */
+val MaterialTheme.rowWashAlpha: Float
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalRowWashAlpha.current
 
 
 private val theme: ColorsScheme
@@ -176,10 +219,8 @@ val Colors.isDark: Boolean
 
 // TODO Do not hardcode theme here and use proper string resource
 val themeLists = listOf(
-    DropDownOption(Theme.Light, "Light"),
-    DropDownOption(Theme.Dark, "Dark"),
-    DropDownOption(Theme.RadioactiveDreams, "Radioactive Dreams"),
-    DropDownOption(Theme.GenXSoftClub, "Gen X Soft Club"),
     DropDownOption(Theme.CalderaNight, "Caldera Night"),
+    DropDownOption(Theme.Claymakers, "Claymakers"),
+    DropDownOption(Theme.ClaymakersNight, "Claymakers Night"),
     DropDownOption(Theme.Custom, "Custom"),
 )

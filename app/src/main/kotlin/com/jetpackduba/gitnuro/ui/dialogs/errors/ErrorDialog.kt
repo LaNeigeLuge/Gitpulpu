@@ -108,7 +108,7 @@ fun ErrorDialog(
                 ) {
                     Text(
                         text = friendlyMessage.second,
-                        color = MaterialTheme.colors.primary,
+                        color = MaterialTheme.colors.primaryVariant,
                         style = MaterialTheme.typography.body2,
                         fontWeight = FontWeight.Medium,
                     )

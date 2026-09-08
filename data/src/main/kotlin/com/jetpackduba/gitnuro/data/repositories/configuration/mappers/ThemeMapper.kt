@@ -10,15 +10,15 @@ private const val CUSTOM = "custom"
 private const val RADIOACTIVE = "radioactive_dreams"
 private const val GEN_X = "gen_x_soft_club"
 private const val CALDERA_NIGHT = "caldera_night"
+private const val CLAYMAKERS = "claymakers"
+private const val CLAYMAKERS_NIGHT = "claymakers_night"
 
 class ThemeMapper @Inject constructor() : DataMapper<Theme?, String?> {
     override fun toData(value: Theme?): String? {
         return when (value) {
-            Theme.Light -> LIGHT
-            Theme.Dark -> DARK
-            Theme.RadioactiveDreams -> RADIOACTIVE
-            Theme.GenXSoftClub -> GEN_X
             Theme.CalderaNight -> CALDERA_NIGHT
+            Theme.Claymakers -> CLAYMAKERS
+            Theme.ClaymakersNight -> CLAYMAKERS_NIGHT
             Theme.Custom -> CUSTOM
             null -> null
         }
@@ -27,11 +27,12 @@ class ThemeMapper @Inject constructor() : DataMapper<Theme?, String?> {
 
     override fun toDomain(value: String?): Theme? {
         return when (value) {
-            LIGHT -> Theme.Light
-            DARK -> Theme.Dark
-            RADIOACTIVE -> Theme.RadioactiveDreams
-            GEN_X -> Theme.GenXSoftClub
             CALDERA_NIGHT -> Theme.CalderaNight
+            CLAYMAKERS -> Theme.Claymakers
+            CLAYMAKERS_NIGHT -> Theme.ClaymakersNight
+            // Retired themes. Anyone whose settings still name one must not hit the
+            // throw below on startup — migrate them to the current default instead.
+            LIGHT, DARK, RADIOACTIVE, GEN_X -> Theme.CalderaNight
             CUSTOM -> Theme.Custom
             null -> null
             else -> throw IllegalStateException("Unhandled theme $value")

@@ -368,6 +368,7 @@ fun ColumnScope.ChangesList(
         listState = listState,
         onAllAction = { onAction(StatusAction.AllEntriesAction(entryType)) },
         onAlternateShowAsTree = { onAction(StatusAction.ToggleShowAsTree) },
+        listWeight = entries.size.coerceIn(2, 14).toFloat(),
     ) {
         items(entries, key = { it.fullPath }) { treeEntry ->
             val isEntrySelected = treeEntry is TreeItem.File<StatusEntry> &&
@@ -437,10 +438,17 @@ fun ColumnScope.ChangesList(
     onSearchFilterChanged: (TextFieldValue) -> Unit,
     onAllAction: () -> Unit,
     onAlternateShowAsTree: () -> Unit,
+    /**
+     * Vertical share of the pane. Was a flat 5f for both lists, which meant a 5-file list
+     * reserved half the pane and left a dead block above the next header. Now proportional to
+     * item count, clamped so an empty list still shows its header and a huge one cannot
+     * squeeze the other to nothing.
+     */
+    listWeight: Float,
     content: LazyListScope.() -> Unit,
 ) {
     val modifier = Modifier
-        .weight(5f)
+        .weight(listWeight)
         .padding(bottom = 4.dp)
         .fillMaxWidth()
     Column(
@@ -463,6 +471,9 @@ fun ColumnScope.ChangesList(
         ScrollableLazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                // rounding the foot of the list makes the space below it read as deliberate
+                // rather than as an unfinished block
+                .clip(RoundedCornerShape(bottomStart = 18.dp, bottomEnd = 18.dp))
                 .background(MaterialTheme.colors.surface),
             state = listState,
         ) {

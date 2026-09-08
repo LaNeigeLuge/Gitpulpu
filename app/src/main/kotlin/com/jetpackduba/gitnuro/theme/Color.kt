@@ -3,28 +3,21 @@ package com.jetpackduba.gitnuro.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * Caldera-inspired color system.
+ * Two themes.
  *
- * Light theme: warm concrete canvas with cream card surfaces, near-black ink text,
- * and Citra Orange (#FC5000) as the single interactive accent.
+ * **Caldera Night** — deep warm charcoal, raised slate surfaces, cream-white text,
+ * Citra Orange as the single interactive accent.
  *
- * Dark theme: deep warm charcoal with raised slate surfaces, cream-white text,
- * same accent colors carried over for consistency.
+ * **Claymakers** — watercolour light theme: pastel washes on near-white paper,
+ * green as the action accent, ink for all text. See Design-Spec-Claymakers in the vault.
  */
 
-// ── Caldera palette tokens ──────────────────────────────────────────────────
-private val ConcreteCanvas = Color(0xFFC4BEB4)   // light bg — warm stone concrete
-private val ParchmentCard  = Color(0xFFF0ECE4)   // light surface — warm parchment
-private val Ink            = Color(0xFF1A1918)    // warm ink text
+// ── Caldera Night palette tokens ────────────────────────────────────────────
 private val PaperWhite     = Color(0xFFFFFFFF)    // text on dark / accent surfaces
-private val BurntOrange    = Color(0xFFE04000)    // primary action / accent
-private val DeepIndigo     = Color(0xFF4438D0)    // decorative / secondary branches
-private val AmberGlow      = Color(0xFFB89868)    // gradient end — deep warm amber
 
-// ── Dark mode accent (brighter orange for dark backgrounds) ────────────────
 private val CitraOrange    = Color(0xFFFC5000)    // brighter orange for dark mode
 
-// ── Dark mode surface tones (more contrast between layers) ──────────────────
+// ── surfaces ────────────────────────────────────────────────────────────────
 private val CharcoalBase   = Color(0xFF121214)    // dark bg — deepest layer
 private val SlateCard      = Color(0xFF1C1C20)    // dark surface — panels, sidebar
 private val SlateSecondary = Color(0xFF262630)    // dark secondary — toolbar, elevated
@@ -37,157 +30,7 @@ private val FileDeleted    = Color(0xFFD03030)    // git: deleted file — bold 
 private val FileConflict   = Color(0xFFD88020)    // git: conflicting file — deep amber
 private val ErrorRed       = Color(0xFFD03030)    // error state
 
-
-val lightTheme = ColorsScheme(
-    primary = BurntOrange,
-    primaryVariant = BurntOrange,
-    onPrimary = PaperWhite,
-    secondary = DeepIndigo,
-    onSecondary = PaperWhite,
-    onBackground = Ink,
-    onBackgroundSecondary = Color(0xFF5C5850),     // warm dark grey — legible on parchment
-    error = ErrorRed,
-    onError = PaperWhite,
-    background = ConcreteCanvas,
-    backgroundSelected = Color(0xFFF0B878),        // amber glow selection
-    surface = ParchmentCard,
-    secondarySurface = Color(0xFFE0DAD0),          // sandstone headers
-    tertiarySurface = Color(0xFFD0C9C0),           // toolbar concrete
-    addFile = FileAdded,
-    deletedFile = FileDeleted,
-    modifiedFile = BurntOrange,
-    conflictingFile = FileConflict,
-    dialogOverlay = Color(0xAA000000),
-    normalScrollbar = Color(0xFFA8A498),           // visible on concrete
-    hoverScrollbar = BurntOrange,
-    diffLineAdded = Color(0xFFCCE8C0),             // saturated mint on parchment
-    diffContentAdded = Color(0x6650C040),           // vivid green inline
-    diffLineRemoved = Color(0xFFF0CCC4),           // warm terracotta blush
-    diffContentRemoved = Color(0x66D84040),         // vivid red inline
-    diffKeyword = Color(0xFF1840A0),               // deep navy on cream
-    diffAnnotation = Color(0xFFB85800),             // burnt amber numbers
-    diffComment = Color(0xFF086828),               // deep forest
-    backgroundGradientEnd = AmberGlow,
-    isLight = true,
-)
-
-
-// ── "Radioactive Dreams" palette ────────────────────────────────────────────
-// A screencapture from a lost PS1 game rendered in Bryce 3D: a toxic swamp world
-// drowned in nuclear haze. Phosphor-green UI glowing off a green-black CRT void,
-// with chromatic-aberration magenta + cyan bleeding at the edges like a glitched
-// PSX framebuffer. Low-bit murk, dithered depth, radioactive dream logic.
-private val VoidMurk      = Color(0xFF050A07)    // deepest bg — green-black CRT void
-private val SwampSurface  = Color(0xFF0B1610)    // panels, sidebar — submerged murk
-private val SwampElevated = Color(0xFF11211A)    // toolbar, elevated surfaces
-private val ReactorTint   = Color(0xFF16281D)    // green-lit accent surface
-private val OozeSelection = Color(0xFF2A1030)    // selection — glitch magenta-purple bleed
-private val ToxicHaze     = Color(0xFF0A1E16)    // gradient end — radioactive sky haze
-
-private val ReactorCore   = Color(0xFF2BFF88)    // nuclear green — primary phosphor accent
-private val ReactorGlow   = Color(0xFF7CFFB0)    // lighter green — accent text on dark
-private val UraniumAcid   = Color(0xFFB6FF3C)    // acid yellow-green — modified files
-private val GlitchMagenta = Color(0xFFFF2D95)    // chromatic magenta — deleted / secondary
-private val GlitchRed     = Color(0xFFFF2D5A)    // hot glitch red — error / abort
-private val PsxCyan       = Color(0xFF23E0FF)    // chromatic cyan — keywords
-private val HazmatAmber   = Color(0xFFFFC53D)    // caution yellow — conflicts
-
-private val PhosphorText  = Color(0xFFC8FFD8)    // phosphorescent screen text
-private val PhosphorDim   = Color(0xFF6E9E80)    // muted swamp-green secondary text
-
-val radioactiveDreamsTheme = ColorsScheme(
-    primary = ReactorCore,
-    primaryVariant = ReactorGlow,
-    onPrimary = VoidMurk,                          // dark text on bright nuclear green
-    secondary = GlitchMagenta,
-    onSecondary = VoidMurk,
-    onBackground = PhosphorText,
-    onBackgroundSecondary = PhosphorDim,
-    error = GlitchRed,
-    onError = VoidMurk,
-    background = VoidMurk,
-    backgroundSelected = OozeSelection,
-    surface = SwampSurface,
-    secondarySurface = SwampElevated,
-    tertiarySurface = ReactorTint,
-    addFile = ReactorCore,
-    deletedFile = GlitchMagenta,
-    modifiedFile = UraniumAcid,
-    conflictingFile = HazmatAmber,
-    dialogOverlay = Color(0xCC02060A),             // deep toxic dim
-    normalScrollbar = Color(0xFF1E3A2A),           // dark swamp scrollbar
-    hoverScrollbar = ReactorCore,
-    diffLineAdded = Color(0xAA103322),             // dark radioactive-green wash
-    diffContentAdded = Color(0x552BFF88),          // nuclear green inline
-    diffLineRemoved = Color(0xAA331028),           // dark glitch-magenta wash
-    diffContentRemoved = Color(0x55FF2D95),        // magenta inline
-    diffKeyword = PsxCyan,                          // chromatic cyan keywords
-    diffAnnotation = HazmatAmber,                   // hazard-yellow numbers
-    diffComment = PhosphorDim,                       // dim swamp comments
-    backgroundGradientEnd = ToxicHaze,              // vertical radioactive haze
-    isLight = false,
-)
-
-
-// ── "Gen X Soft Club" palette ────────────────────────────────────────────────
-// A late-night 1990s nightclub shot on expired 35mm: a dim warm-smoke room, velvet
-// and chrome surfaces, soft diffused neon in dusty teal, mauve and amber bleeding
-// through hazy air. Low contrast, desaturated, faded warmth — wistful glamour, not
-// bright modern club energy. Softness over sharpness; nothing is neon-hard here.
-private val SmokeRoom     = Color(0xFF191620)    // dim warm-smoke bg — the dark room
-private val VelvetPanel   = Color(0xFF221E2A)    // panels, sidebar — worn velvet
-private val ChromeDusk    = Color(0xFF2A2532)    // toolbar, elevated — dusty chrome
-private val AmberBooth    = Color(0xFF2C2822)    // amber-lit accent surface
-private val NeonHalo      = Color(0xFF2E2838)    // selection — soft mauve glow
-private val FloorHaze     = Color(0xFF1F2329)    // gradient end — cool neon floor-haze
-
-private val FadedTeal     = Color(0xFF6DB3AB)    // dusty teal neon — primary accent
-private val TealBloom     = Color(0xFF8FC9C1)    // lighter teal — accent text on dark
-private val DustyMauve    = Color(0xFFBC8FB2)    // dusty rose/mauve neon — secondary
-private val MutedAmber    = Color(0xFFD6A868)    // muted amber neon — modified/highlight
-private val SageTeal      = Color(0xFF83B8A0)    // soft sage-teal — added
-private val FadedRose     = Color(0xFFCF8794)    // faded rose — deleted / error
-private val DuskyOrange   = Color(0xFFCE9463)    // dusky orange — conflict
-private val LavenderInk   = Color(0xFFAF9BC9)    // soft lavender — keywords
-
-private val FadedCream    = Color(0xFFDED4C6)    // warm faded-film text (low contrast)
-private val SmokeGray     = Color(0xFF928A94)    // dusty mauve-gray — secondary text
-
-val genXSoftClubTheme = ColorsScheme(
-    primary = FadedTeal,
-    primaryVariant = TealBloom,
-    onPrimary = SmokeRoom,                         // dark text on soft teal
-    secondary = DustyMauve,
-    onSecondary = SmokeRoom,
-    onBackground = FadedCream,
-    onBackgroundSecondary = SmokeGray,
-    error = FadedRose,
-    onError = SmokeRoom,
-    background = SmokeRoom,
-    backgroundSelected = NeonHalo,
-    surface = VelvetPanel,
-    secondarySurface = ChromeDusk,
-    tertiarySurface = AmberBooth,
-    addFile = SageTeal,
-    deletedFile = FadedRose,
-    modifiedFile = MutedAmber,
-    conflictingFile = DuskyOrange,
-    dialogOverlay = Color(0xAA141019),             // warm smoke haze, not hard black
-    normalScrollbar = Color(0xFF3A3440),           // dusty velvet scrollbar
-    hoverScrollbar = FadedTeal,
-    diffLineAdded = Color(0x552E4A46),             // soft dark-teal wash
-    diffContentAdded = Color(0x4483B8A0),          // sage-teal inline
-    diffLineRemoved = Color(0x554A3236),           // soft dark-rose wash
-    diffContentRemoved = Color(0x44CF8794),        // faded-rose inline
-    diffKeyword = LavenderInk,                      // soft lavender keywords
-    diffAnnotation = Color(0xFFC9A56B),             // muted amber numbers
-    diffComment = Color(0xFF7E8A82),                 // quiet smoke-green comments
-    backgroundGradientEnd = FloorHaze,              // gentle vertical neon haze
-    isLight = false,
-)
-
-
-val darkTheme = ColorsScheme(
+val calderaNightTheme = ColorsScheme(
     primary = CitraOrange,
     primaryVariant = Color(0xFFFF8A50),             // lighter orange for text on dark bg
     onPrimary = PaperWhite,
@@ -217,5 +60,173 @@ val darkTheme = ColorsScheme(
     diffAnnotation = Color(0xFFD0CC60),             // warm annotation yellow
     diffComment = Color(0xFF70C290),                // soft green comments
     backgroundGradientEnd = CharcoalBase,           // no gradient in dark mode
+    isLight = false,
+)
+
+// ── Claymakers palette tokens ───────────────────────────────────────────────
+// The brief's four colours, plus tints. Surfaces are deliberately *tinted* rather than
+// near-white: at #FDF8F5 paper the screen read as white, so the whole set is pushed a step
+// warmer and more saturated, salmon-leaning. Every wash below still holds Ink at 9-12:1.
+private val Green      = Color(0xFF9BC400)   // action accent — FILL ONLY, 1.94:1 on paper
+private val GreenDeep  = Color(0xFF6D8C10)   // hover / pressed
+private val Lilac      = Color(0xFF8076A3)   // decorative secondary
+private val Plum       = Color(0xFF7C677F)   // given
+
+// surfaces — warmer and stronger than the brief's, to get colour onto the screen
+private val ClayGround = Color(0xFFF7E4DC)   // page ground — salmon paper
+private val ClayPaper  = Color(0xFFFDF1EE)   // panel surface
+private val ClayVeil   = Color(0xFFE4DEEF)   // rails, headers — lilac veil
+private val ClayRaised = Color(0xFFF9D9D1)   // chips, raised — deeper salmon
+private val ClayPicked = Color(0xFFCBC1DE)   // selection — lilac, ink still 7.9:1
+private val ClayEdge   = Color(0xFFF3ECE7)   // gradient end
+
+// status washes — richer than the brief's pales so rows carry real colour
+private val WashAdd    = Color(0xFFD8E6A8)   // ink 10.24:1
+private val WashDel    = Color(0xFFF0C9C3)   // ink  8.97:1
+private val WashMod    = Color(0xFFEED9A8)   // ink  9.80:1
+private val WashConf   = Color(0xFFD9D0EA)   // ink  9.18:1
+
+// Tried stronger diff bands (#B9D75F / #EE9E92) for findability. Reverted: on a newly added
+// file every line is an add, so the whole pane became a solid green block. In a diff the wash
+// has to stay a wash.
+
+// text
+private val InkPlum    = Color(0xFF33284A)   // primary text — 12.31:1 on ClayPaper
+private val InkSoft    = Color(0xFF564E66)   // secondary — darkened from #6B6180 so it also
+                                             // clears AA on ClayPicked (4.57:1)
+
+// Status/syntax tier, darkened again to hold 4.5:1 on the *richer* washes above.
+private val AddInk     = Color(0xFF546B0C)   // 4.53 on WashAdd
+private val DelInk     = Color(0xFF94413A)   // 4.50 on WashDel
+private val ModInk     = Color(0xFF7A5A27)   // 4.56 on WashMod
+private val ConfInk    = Color(0xFF675569)   // 4.60 on WashConf
+private val KeywordInk = Color(0xFF736799)   // 4.60 on ClayPaper
+
+/**
+ * Claymakers — watercolour light theme.
+ *
+ * Status is carried by the row wash plus a coloured glyph; body text stays [InkPlum] at
+ * 12.91:1 throughout. That is deliberate: a pastel palette on near-white paper cannot hold
+ * small coloured text at AA, so colour lives in the background instead of the type.
+ */
+val claymakersTheme = ColorsScheme(
+    primary = Green,
+    primaryVariant = AddInk,                        // accent-TEXT role — Green is 1.94:1
+    onPrimary = InkPlum,
+    secondary = Lilac,
+    onSecondary = ClayPaper,
+    onBackground = InkPlum,
+    onBackgroundSecondary = InkSoft,
+    error = DelInk,
+    onError = ClayPaper,
+    background = ClayGround,
+    backgroundSelected = ClayPicked,
+    surface = ClayPaper,
+    secondarySurface = ClayVeil,
+    tertiarySurface = ClayRaised,
+    addFile = AddInk,
+    deletedFile = DelInk,
+    modifiedFile = ModInk,
+    conflictingFile = ConfInk,
+    dialogOverlay = Color(0x8833284A),
+    normalScrollbar = ClayPicked,
+    hoverScrollbar = Lilac,
+    diffLineAdded = WashAdd,
+    diffContentAdded = Color(0x669BC400),
+    diffLineRemoved = WashDel,
+    diffContentRemoved = Color(0x66C4706A),
+    diffKeyword = KeywordInk,
+    diffAnnotation = ModInk,
+    diffComment = InkSoft,
+    backgroundGradientEnd = ClayEdge,
+    isLight = true,
+)
+
+/**
+ * Commit-graph lanes. Separate from [ColorsScheme] because the graph is Canvas-drawn and the
+ * palette is a sequence of roles, not a set. Provided per-theme via LocalGraphColors.
+ */
+val calderaGraphColors = listOf(
+    Color(0xFFE06020), Color(0xFF7B8BDD), Color(0xFF5AAA70), Color(0xFFCC9530),
+    Color(0xFFD06878), Color(0xFF4AA8B8), Color(0xFF9980CC), Color(0xFFD88840),
+)
+
+/**
+ * Lane and chip colours — one palette so a branch's graph line and its pill are the same colour.
+ *
+ * These are the vibrant tier: each clears 4.5:1 with Ink, so a chip can carry dark text like the
+ * Stage-all button does. As a hairline on paper they measure 1.5-2.3:1, below WCAG's 3:1 for
+ * graphics, which is why the lane stroke is drawn a little thicker on light themes.
+ */
+val claymakersGraphColors = listOf(
+    Color(0xFF9BC400),    // green   ink 6.67:1 — same as the Stage-all button
+    Color(0xFFB0A6D4),    // lilac   ink 5.99:1
+    Color(0xFFE8968E),    // clay    ink 5.95:1
+    Color(0xFFE0B662),    // ochre   ink 7.15:1
+    Color(0xFFB49BB7),    // plum    ink 5.39:1
+    Color(0xFFA99FC9),    // iris    ink 5.50:1
+    Color(0xFF95BCC4),    // slate   ink 6.65:1
+    Color(0xFFB3D92E),    // lime    ink 8.35:1
+)
+
+// ── Claymakers Night palette tokens ─────────────────────────────────────────
+// The light theme inverted rather than re-derived: its ink #33284A becomes the ground, and its
+// vibrant lane/chip tier becomes the foreground. Contrast is symmetric, so every colour built
+// to hold dark ink also reads as light-on-dark — the vibrant set lands at 6.4-9.9:1 here,
+// better than it does on paper.
+private val NightGround = Color(0xFF1C1629)   // page ground — deepest plum
+private val NightPanel  = Color(0xFF241D35)   // panel surface
+private val NightVeil   = Color(0xFF2E2542)   // rails, headers
+private val NightRaised = Color(0xFF3A2F52)   // chips, raised
+private val NightPicked = Color(0xFF3F3459)   // selection — NOT #463A63: that left clay/plum/
+                                              // iris at 4.06-4.49:1. This clears 4.5 for all three.
+private val NightEdge   = Color(0xFF161122)   // gradient end
+
+private val NightText   = Color(0xFFFDF1EE)   // primary — 14.59:1 on panel (the light theme's paper)
+private val NightSoft   = Color(0xFFA99CC4)   // secondary — 6.33:1
+
+// dark diff bands: kept as washes, same lesson as the light theme — on a newly added file
+// every line is an add, so a strong band swallows the pane
+private val NightWashAdd = Color(0xFF33421F)  // band 1.49 vs panel, text 9.79:1
+private val NightWashDel = Color(0xFF52272F)  // band 1.30 vs panel, text 11.24:1
+
+/**
+ * Claymakers Night — the watercolour palette after dark.
+ *
+ * Same structure as the light theme: status lives in the row wash and a coloured glyph, text
+ * stays at high contrast. Depth is genuinely available here in a way it is not on paper —
+ * probe C2 showed black shadows are invisible on dark grounds but coloured ones read clearly,
+ * so a green shadow sits at 8.6:1 against the ground and works as a glow.
+ */
+val claymakersNightTheme = ColorsScheme(
+    primary = Green,
+    primaryVariant = Color(0xFFB3D92E),             // lime — accent text, 9.89:1 on panel
+    onPrimary = NightGround,                        // dark text on the vibrant fill, as on light
+    secondary = Color(0xFFB0A6D4),                  // lilac
+    onSecondary = NightGround,
+    onBackground = NightText,
+    onBackgroundSecondary = NightSoft,
+    error = Color(0xFFE8968E),
+    onError = NightGround,
+    background = NightGround,
+    backgroundSelected = NightPicked,
+    surface = NightPanel,
+    secondarySurface = NightVeil,
+    tertiarySurface = NightRaised,
+    addFile = Green,                                // 7.90:1
+    deletedFile = Color(0xFFE8968E),                // 7.05:1
+    modifiedFile = Color(0xFFE0B662),               // 8.48:1
+    conflictingFile = Color(0xFFC9B4CB),            // 8.35:1
+    dialogOverlay = Color(0xB3120E1C),
+    normalScrollbar = NightRaised,
+    hoverScrollbar = Color(0xFFB0A6D4),
+    diffLineAdded = NightWashAdd,
+    diffContentAdded = Color(0x559BC400),
+    diffLineRemoved = NightWashDel,
+    diffContentRemoved = Color(0x55E8968E),
+    diffKeyword = Color(0xFFB0A6D4),                // 7.10:1
+    diffAnnotation = Color(0xFFE0B662),             // 8.48:1
+    diffComment = NightSoft,                        // 6.33:1
+    backgroundGradientEnd = NightEdge,
     isLight = false,
 )

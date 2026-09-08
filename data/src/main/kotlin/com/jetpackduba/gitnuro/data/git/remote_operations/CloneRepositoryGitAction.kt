@@ -2,6 +2,8 @@ package com.jetpackduba.gitnuro.data.git.remote_operations
 
 import com.jetpackduba.gitnuro.common.printDebug
 import com.jetpackduba.gitnuro.common.printError
+import com.jetpackduba.gitnuro.domain.errors.GenericError
+import com.jetpackduba.gitnuro.domain.errors.onErr
 import com.jetpackduba.gitnuro.domain.models.CloneState
 import com.jetpackduba.gitnuro.data.git.submodules.InitializeAllSubmodulesGitAction
 import com.jetpackduba.gitnuro.domain.interfaces.ICloneRepositoryGitAction
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.isActive
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.ProgressMonitor
 import java.io.File
 import javax.inject.Inject
@@ -73,15 +76,22 @@ class CloneRepositoryGitAction @Inject constructor(
                     .setTransportConfigCallback { handleTransport(it) }
                     .setCloneSubmodules(cloneSubmodules)
                     .call()
+            }.onErr { error ->
+                // The transport wrapper swallows exceptions into an Either, so rethrow to report the
+                // real failure instead of failing later with a misleading message
+                throw (error as? GenericError)?.exception ?: Exception(error.toString())
             }
 
             val git = Git.open(directory)
 
-            useBuiltinLfs(git.repository) {
-                git.checkout()
-                    .setName(git.repository.fullBranch)
-                    .setForced(true)
-                    .call()
+            // ponytail: a remote with no commits has no HEAD to resolve, nothing to check out
+            if (git.repository.resolve(Constants.HEAD) != null) {
+                useBuiltinLfs(git.repository) {
+                    git.checkout()
+                        .setName(git.repository.fullBranch)
+                        .setForced(true)
+                        .call()
+                }
             }
 
             // TODO Test this
@@ -92,7 +102,7 @@ class CloneRepositoryGitAction @Inject constructor(
             channel.close()
         } catch (ex: Exception) {
             printError(TAG, ex.localizedMessage, ex)
-            if (ex.cause?.cause is CancellationException) {
+            if (ex is CancellationException || ex.cause?.cause is CancellationException) {
                 printDebug(TAG, "Clone cancelled")
             } else {
                 trySend(CloneState.Fail(ex.localizedMessage))

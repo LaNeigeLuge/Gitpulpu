@@ -29,6 +29,10 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -42,6 +46,7 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -73,18 +78,6 @@ import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.RepositoryState
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-
-// Caldera-inspired graph palette — warm and readable, not neon
-private val colors = listOf(
-    Color(0xFFE06020),  // Burnt Orange — primary lane
-    Color(0xFF7B8BDD),  // Muted Periwinkle — branches
-    Color(0xFF5AAA70),  // Sage Green — feature branches
-    Color(0xFFCC9530),  // Warm Gold — hotfix/release
-    Color(0xFFD06878),  // Dusty Rose — secondary
-    Color(0xFF4AA8B8),  // Teal — other lanes
-    Color(0xFF9980CC),  // Muted Lavender — extra lane
-    Color(0xFFD88840),  // Clay — extra lane
-)
 
 private const val CANVAS_MIN_WIDTH = 100
 private const val CANVAS_DEFAULT_WIDTH = 120
@@ -829,6 +822,9 @@ private fun CommitLine(
                 .height(MaterialTheme.linesHeight.logCommitHeight)
                 .handMouseClickable { onRevCommitSelected() }
         ) {
+            val colors = MaterialTheme.graphColors
+    // vibrant lanes sit at 1.5-2.3:1 on paper, so light themes get a thicker stroke
+    val laneStroke = if (MaterialTheme.colors.isLight) 3.4f else 2.5f
             val nodeColor = colors[graphNode.lane % colors.size]
 
             Box {
@@ -852,12 +848,16 @@ private fun CommitLine(
 
             // A tagged commit is usually a release — band the whole row to separate it visually
             val isTagged = tags.isNotEmpty()
+            // Light themes tint the branch-tip row with its own lane colour. Very low alpha:
+            // it should read as a highlight, not as a status wash. 0f leaves dark themes alone.
+            val branchWash = if (MaterialTheme.colors.isLight) 0.16f else 0f
 
             Box(
                 modifier = Modifier
                     .padding(start = graphWidth)
                     .fillMaxHeight()
                     .background(MaterialTheme.colors.surface)
+                    .backgroundIf(branches.isNotEmpty(), nodeColor.copy(alpha = branchWash))
                     .backgroundIf(isTagged, MaterialTheme.colors.secondary.copy(alpha = 0.13f))
                     .backgroundIf(isSelected, MaterialTheme.colors.backgroundSelected)
             ) {
@@ -1086,6 +1086,9 @@ fun CommitsGraph(
     val laneWidthWithDensity = remember(density) {
         LANE_WIDTH * density
     }
+    val colors = MaterialTheme.graphColors
+    // vibrant lanes sit at 1.5-2.3:1 on paper, so light themes get a thicker stroke
+    val laneStroke = if (MaterialTheme.colors.isLight) 3.4f else 2.5f
 
     Box(
         modifier = modifier
@@ -1099,7 +1102,7 @@ fun CommitsGraph(
         Canvas(
             modifier = Modifier.fillMaxSize()
         ) {
-            val lineWidth = 2.5f * density
+            val lineWidth = laneStroke * density
             val glowWidth = 6f * density
             // Dashed pattern for stash entries
             val dashEffect = if (isStash) PathEffect.dashPathEffect(
@@ -1111,51 +1114,37 @@ fun CommitsGraph(
                     val color = colors[itemPosition % colors.size]
                     val start = Offset(laneWidthWithDensity * (itemPosition + 1), this.center.y)
                     val end = Offset(laneWidthWithDensity * (itemPosition + 1), 0f)
-                    if (isStash) {
-                        drawDashedLine(color, start, end, lineWidth, dashEffect!!)
-                    } else {
-                        drawGlowLine(color, start, end, lineWidth, glowWidth)
-                    }
+                    drawLane(color, start, end, lineWidth, glowWidth, pathEffect = dashEffect)
                 }
 
                 forkingOffLanes.forEach { plotLane ->
                     val color = colors[plotLane % colors.size]
                     val start = Offset(laneWidthWithDensity * (itemPosition + 1), this.center.y)
                     val end = Offset(laneWidthWithDensity * (plotLane + 1), 0f)
-                    if (isStash) {
-                        drawDashedLine(color, start, end, lineWidth, dashEffect!!)
-                    } else {
-                        drawGlowLine(color, start, end, lineWidth, glowWidth)
-                    }
+                    // leaves the node sideways, arrives at the lane above running vertically
+                    drawLane(color, start, end, lineWidth, glowWidth, false, dashEffect)
                 }
 
                 mergingLanes.forEach { plotLane ->
                     val color = colors[plotLane % colors.size]
                     val start = Offset(laneWidthWithDensity * (plotLane + 1), this.size.height)
                     val end = Offset(laneWidthWithDensity * (itemPosition + 1), this.center.y)
-                    if (isStash) {
-                        drawDashedLine(color, start, end, lineWidth, dashEffect!!)
-                    } else {
-                        drawGlowLine(color, start, end, lineWidth, glowWidth)
-                    }
+                    // rises vertically out of its own lane, then bends into the node
+                    drawLane(color, start, end, lineWidth, glowWidth, true, dashEffect)
                 }
 
                 if (plotCommit.commit.parentCount > 0) {
                     val color = colors[itemPosition % colors.size]
                     val start = Offset(laneWidthWithDensity * (itemPosition + 1), this.center.y)
                     val end = Offset(laneWidthWithDensity * (itemPosition + 1), this.size.height)
-                    if (isStash) {
-                        drawDashedLine(color, start, end, lineWidth, dashEffect!!)
-                    } else {
-                        drawGlowLine(color, start, end, lineWidth, glowWidth)
-                    }
+                    drawLane(color, start, end, lineWidth, glowWidth, pathEffect = dashEffect)
                 }
 
                 passingLanes.forEach { plotLane ->
                     val color = colors[plotLane % colors.size]
                     val start = Offset(laneWidthWithDensity * (plotLane + 1), 0f)
                     val end = Offset(laneWidthWithDensity * (plotLane + 1), this.size.height)
-                    drawGlowLine(color, start, end, lineWidth, glowWidth)
+                    drawLane(color, start, end, lineWidth, glowWidth)
                 }
             }
         }
@@ -1172,51 +1161,39 @@ fun CommitsGraph(
 }
 
 /**
- * Draws a dashed line for stash entries — no glow, just a clean dotted stroke.
+ * One lane segment. A lane holding its column is a straight run; a lane changing column bends
+ * through a quadratic elbow whose control point sits on the corner carrying the vertical part,
+ * so it leaves one end vertically and meets the other horizontally rather than cutting across
+ * as a diagonal. [verticalAtStart] says which end carries it.
  */
-private fun DrawScope.drawDashedLine(
-    color: Color,
-    start: Offset,
-    end: Offset,
-    strokeWidth: Float,
-    pathEffect: PathEffect,
-) {
-    drawLine(
-        color = color.copy(alpha = 0.7f),
-        start = start,
-        end = end,
-        strokeWidth = strokeWidth,
-        cap = StrokeCap.Round,
-        pathEffect = pathEffect,
-    )
+internal fun lanePath(start: Offset, end: Offset, verticalAtStart: Boolean): Path = Path().apply {
+    moveTo(start.x, start.y)
+    if (start.x == end.x) {
+        lineTo(end.x, end.y)
+    } else {
+        val control = if (verticalAtStart) Offset(start.x, end.y) else Offset(end.x, start.y)
+        quadraticTo(control.x, control.y, end.x, end.y)
+    }
 }
 
-/**
- * Draws a line with a soft glow behind it — the glow is the same color at low alpha,
- * drawn wider behind the main stroke. Gives branch lines a luminous, organic feel.
- */
-private fun DrawScope.drawGlowLine(
+private fun DrawScope.drawLane(
     color: Color,
     start: Offset,
     end: Offset,
     strokeWidth: Float,
     glowWidth: Float,
+    verticalAtStart: Boolean = false,
+    pathEffect: PathEffect? = null,
 ) {
-    // Glow layer — visible halo behind the line
-    drawLine(
-        color = color.copy(alpha = 0.25f),
-        start = start,
-        end = end,
-        strokeWidth = glowWidth,
-        cap = StrokeCap.Round,
-    )
-    // Main line — round caps for organic feel
-    drawLine(
-        color = color,
-        start = start,
-        end = end,
-        strokeWidth = strokeWidth,
-        cap = StrokeCap.Round,
+    val path = lanePath(start, end, verticalAtStart)
+    if (pathEffect == null) {
+        // soft halo behind the stroke
+        drawPath(path, color.copy(alpha = 0.20f), style = Stroke(glowWidth, cap = StrokeCap.Round))
+    }
+    drawPath(
+        path = path,
+        color = if (pathEffect == null) color else color.copy(alpha = 0.7f),
+        style = Stroke(width = strokeWidth, cap = StrokeCap.Round, pathEffect = pathEffect),
     )
 }
 
@@ -1288,6 +1265,9 @@ fun UncommittedChangesGraphNode(
     val laneWidthWithDensity = remember(density) {
         LANE_WIDTH * density
     }
+    val colors = MaterialTheme.graphColors
+    // vibrant lanes sit at 1.5-2.3:1 on paper, so light themes get a thicker stroke
+    val laneStroke = if (MaterialTheme.colors.isLight) 3.4f else 2.5f
     Box(
         modifier = modifier
             .backgroundIf(isSelected, MaterialTheme.colors.backgroundSelected)
@@ -1305,7 +1285,7 @@ fun UncommittedChangesGraphNode(
                 val ringWidth = 2.5f * density
 
                 if (hasPreviousCommits) {
-                    drawGlowLine(
+                    drawLane(
                         colors[0],
                         start = nodeCenter,
                         end = Offset(laneWidthWithDensity, this.size.height),
@@ -1375,17 +1355,20 @@ fun BranchChip(
         )
     }
 
-    // Local = PC icon + full color, Remote = cloud icon + muted color
+    // Local = PC icon + full colour, Remote = cloud icon + muted colour.
+    // The vibrant tier has to be resolved BEFORE muting: on a light theme "muted" means paler,
+    // not darker — darkening a fill that has to hold dark ink makes it unreadable.
     val chipIcon = if (ref.isLocal) Res.drawable.computer else Res.drawable.cloud
-    val chipColor = if (ref.isRemote) {
-        // Remote branches: darken + desaturate the color slightly
-        color.copy(
-            red = color.red * 0.7f,
-            green = color.green * 0.7f,
-            blue = color.blue * 0.7f,
+    val isLightTheme = MaterialTheme.colors.isLight
+    val chipBase = color
+    val chipColor = when {
+        !ref.isRemote -> chipBase
+        chipBase.luminance() > 0.4f -> lerp(chipBase, MaterialTheme.colors.surface, 0.42f)
+        else -> chipBase.copy(
+            red = chipBase.red * 0.7f,
+            green = chipBase.green * 0.7f,
+            blue = chipBase.blue * 0.7f,
         )
-    } else {
-        color
     }
 
     var endingContent: @Composable () -> Unit = {}
@@ -1469,11 +1452,24 @@ fun Chip(
     contextMenuItemsList: () -> List<ContextMenuElement>,
     endingContent: @Composable () -> Unit = {},
 ) {
+    // On a light ground a saturated fill with white text is harsh, so light themes get a
+    // pastel wash of the ref colour with the ref colour itself as text. Dark themes keep the
+    // solid fill they were designed around.
+    // [color] arrives already resolved by the caller. Pick the label colour from the FILL's
+    // luminance, not from whether the theme is light: Claymakers Night is a dark theme with
+    // vibrant light chip fills, and an isLight test gets that exactly backwards.
+    val chipFill = color
+    val onChip = if (chipFill.luminance() > 0.4f) {
+        MaterialTheme.colors.onPrimary
+    } else {
+        Color.White
+    }
+
     Box(
         modifier = Modifier
             .padding(horizontal = 4.dp)
             .clip(AppShapes.pill)
-            .background(color)
+            .background(chipFill)
             .combinedClickable(onDoubleClick = onCheckoutRef, onClick = {})
             .handOnHover()
     ) {
@@ -1490,12 +1486,13 @@ fun Chip(
                         .size(14.dp),
                     painter = painterResource(icon),
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = onChip,
                 )
                 Text(
                     text = text,
                     style = MaterialTheme.typography.body2,
-                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold,
+                    color = onChip,
                     maxLines = 1,
                     modifier = Modifier.padding(start = 4.dp, end = 8.dp)
                 )

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk -F: '{s+=$2} END {print s}')",
+      "Bash(curl -sSL --max-time 60 -o /tmp/claude-1000/-home-julienrose-Documents-Gitpulpu/b0970b01-01f0-4f75-ad60-c0f967bc1b93/scratchpad/expfonts/Figtree-VF.ttf https://raw.githubusercontent.com/google/fonts/main/ofl/figtree/Figtree%5Bwght%5D.ttf)",
+      "Bash(python3 -c ' *)"
+    ]
+  }
+}
