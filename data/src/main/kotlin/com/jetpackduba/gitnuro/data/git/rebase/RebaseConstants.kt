@@ -7,4 +7,6 @@ object RebaseConstants {
     const val DONE = "done"
     const val STOPPED_SHA = "stopped-sha"
     const val AMEND = "amend"
+    const val HEAD_NAME = "head-name"
+    const val ONTO = "onto"
 }

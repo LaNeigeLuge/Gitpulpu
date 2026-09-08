@@ -10,7 +10,6 @@ import com.jetpackduba.gitnuro.common.printLog
 import com.jetpackduba.gitnuro.domain.TabCoroutineScope
 import com.jetpackduba.gitnuro.domain.errors.Either
 import com.jetpackduba.gitnuro.domain.errors.okOrNull
-import com.jetpackduba.gitnuro.domain.exceptions.InvalidMessageException
 import com.jetpackduba.gitnuro.domain.extensions.lowercaseContains
 import com.jetpackduba.gitnuro.domain.extensions.toMutableSetAndAdd
 import com.jetpackduba.gitnuro.domain.extensions.toMutableSetAndRemove
@@ -1077,16 +1076,23 @@ class RepositoryOpenViewModel @Inject constructor(
         }
 
         override fun modifyCommitMessage(commit: String): String {
-            // This can be called when there aren't any reword steps if squash is used.
-            val step = rewordSteps.removeFirstOrNull() ?: return commit
-
             val rebaseState = rebaseState.value
             if (rebaseState !is RebaseInteractiveViewState.Loaded) {
                 throw Exception("modifyCommitMessage called when rebaseState is not Loaded") // Should never happen, just in case
             }
 
-            return rebaseState.messages[step.commit.name()]
-                ?: throw InvalidMessageException("Message for commit $commit is unexpectedly null")
+            // JGit calls this both for reword steps (passing that commit's original message) and for
+            // squash steps (passing the combined message). Only a reword may consume a reword edit,
+            // otherwise a squash would steal the next reword's text and leave the reword unapplied.
+            val step = rewordSteps.firstOrNull() ?: return commit
+
+            if (rebaseState.originalMessages[step.commit.name()] != commit) {
+                return commit
+            }
+
+            rewordSteps.removeFirst()
+
+            return rebaseState.messages[step.commit.name()] ?: commit
         }
     }
 
@@ -1126,7 +1132,7 @@ class RepositoryOpenViewModel @Inject constructor(
                             )
                         }
 
-                    val newState = RebaseInteractiveViewState.Loaded(steps, data.messages)
+                    val newState = RebaseInteractiveViewState.Loaded(steps, data.messages, data.source)
 
                     if (!isSameRebase(steps, rebaseState.value)) {
                         rebaseState.value = newState
@@ -1201,10 +1207,11 @@ class RepositoryOpenViewModel @Inject constructor(
     }
 
     fun selectLine(line: RebaseLine) = viewModelScope.launch {
-        val fullCommit = getCommitFromRebaseLineUseCase(TODO()/*line.commit*/, line.shortMessage)
-//        tabState.newSelectedCommit(TODO()/*line.commit*/)
+        val commit = getCommitFromRebaseLineUseCase(line.commit.name(), line.shortMessage).okOrNull()
 
-        null
+        if (commit != null) {
+            selectCommit(commit)
+        }
     }
 
     fun moveCommit(from: Int, to: Int) {

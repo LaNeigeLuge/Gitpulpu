@@ -90,6 +90,30 @@ class RebaseInteractiveTodoTest {
         )
     }
 
+    @Test
+    fun `rebase source names the rebased branch and the branch it is replayed onto`() = runBlocking {
+        val base = git.log().call().toList().last { it.fullMessage.trim() == "base" }
+        val branchBeingRebased = git.repository.branch
+        git.branchCreate().setName("trunk").setStartPoint(base).call()
+
+        startInteractiveRebaseOntoBase()
+
+        val source = (GetRebaseSourceGitAction(jgit)(repoDir.absolutePath) as Either.Ok).value
+
+        assertEquals(branchBeingRebased, source?.branchName)
+        assertEquals("trunk", source?.ontoName)
+        assertEquals(base.name, source?.ontoHash)
+
+        git.rebase().setOperation(org.eclipse.jgit.api.RebaseCommand.Operation.ABORT).call()
+        Unit
+    }
+
+    @Test
+    fun `rebase source is null when no rebase is in progress`() = runBlocking {
+        val source = (GetRebaseSourceGitAction(jgit)(repoDir.absolutePath) as Either.Ok).value
+        assertEquals(null, source)
+    }
+
     private suspend fun startInteractiveRebaseOntoBase() {
         val base = git.log().call().toList().last { it.fullMessage.trim() == "base" }
 

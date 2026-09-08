@@ -7,7 +7,9 @@ import com.jetpackduba.gitnuro.domain.errors.bind
 import com.jetpackduba.gitnuro.domain.errors.either
 import com.jetpackduba.gitnuro.domain.interfaces.IGetCommitFromRebaseLineGitAction
 import com.jetpackduba.gitnuro.domain.interfaces.IGetRebaseInteractiveTodoLinesGitAction
+import com.jetpackduba.gitnuro.domain.interfaces.IGetRebaseSourceGitAction
 import com.jetpackduba.gitnuro.domain.models.RebaseLine
+import com.jetpackduba.gitnuro.domain.models.RebaseSource
 import com.jetpackduba.gitnuro.domain.repositories.RepositoryDataRepository
 import javax.inject.Inject
 
@@ -15,11 +17,13 @@ import javax.inject.Inject
 data class RebaseInteractiveData(
     val lines: List<RebaseLine>,
     val messages: Map<String, String>,
+    val source: RebaseSource?,
 )
 
 class LoadRebaseInteractiveUseCase @Inject constructor(
     private val getRebaseInteractiveTodoLinesGitAction: IGetRebaseInteractiveTodoLinesGitAction,
     private val getCommitFromRebaseLineGitAction: IGetCommitFromRebaseLineGitAction,
+    private val getRebaseSourceGitAction: IGetRebaseSourceGitAction,
     private val repositoryDataRepository: RepositoryDataRepository,
 ) {
     suspend operator fun invoke(): Either<RebaseInteractiveData, GitError> {
@@ -33,7 +37,7 @@ class LoadRebaseInteractiveUseCase @Inject constructor(
                 line.commit to (commit?.message ?: line.shortMessage)
             }
 
-            Either.Ok(RebaseInteractiveData(lines, messages))
+            Either.Ok(RebaseInteractiveData(lines, messages, getRebaseSourceGitAction(path).bind()))
         }
     }
 }

@@ -123,8 +123,20 @@ fun RebaseStateLoaded(
 
             Spacer(modifier = Modifier.width(12.dp))
 
+            // Spell out who is being replayed onto whom, so the direction of the rebase is unambiguous
+            val source = rebaseState.source
             Text(
-                text = "${stepsList.size} commits",
+                text = if (source == null) {
+                    "${stepsList.size} commits"
+                } else {
+                    val onto = if (source.ontoName == source.ontoHash.take(7)) {
+                        source.ontoName
+                    } else {
+                        "${source.ontoName} (${source.ontoHash.take(7)})"
+                    }
+
+                    "${source.branchName ?: "detached HEAD"} \u2192 $onto  \u00b7  ${stepsList.size} commits"
+                },
                 color = MaterialTheme.colors.onBackgroundSecondary,
                 fontSize = 12.sp,
             )

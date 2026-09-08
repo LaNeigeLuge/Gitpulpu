@@ -1,5 +1,6 @@
 package com.jetpackduba.gitnuro.viewmodels
 
+import com.jetpackduba.gitnuro.domain.models.RebaseSource
 import org.eclipse.jgit.lib.AbbreviatedObjectId
 import org.eclipse.jgit.lib.RebaseTodoLine
 import org.eclipse.jgit.lib.RebaseTodoLine.Action
@@ -8,7 +9,13 @@ private const val TAG = "RebaseInteractiveViewMo"
 
 sealed interface RebaseInteractiveViewState {
     object Loading : RebaseInteractiveViewState
-    data class Loaded(val stepsList: List<RebaseLine>, val messages: Map<String, String>) : RebaseInteractiveViewState
+    data class Loaded(
+        val stepsList: List<RebaseLine>,
+        val messages: Map<String, String>,
+        val source: RebaseSource?,
+        /** Messages as they were when the plan was loaded; [messages] holds the user's edits. */
+        val originalMessages: Map<String, String> = messages,
+    ) : RebaseInteractiveViewState
     data class Failed(val error: String) : RebaseInteractiveViewState
 }
 
