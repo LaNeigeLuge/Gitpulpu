@@ -9,11 +9,11 @@ If the player doesn't load, [watch the demo](gitpulpu_demo.mp4).
 
 ## What's different from Gitnuro
 
-- **Caldera-inspired theme** — warm dark mode with glow-line graph, concrete light mode with gradient background and floating parchment cards
 - **Auto-stash checkout** — switching branches with uncommitted changes automatically stashes, checks out, and pops. No more conflict dialogs for simple branch switches
 - **Friendly error messages** — known errors (merge conflicts, auth failures, ref collisions) show actionable guidance instead of raw stack traces
 - **Interactive rebase redesign** — color-coded actions, visible commit hashes, drag handles, and strikethrough on dropped commits
 - **Syntax highlighting fix** — resolved a crash (StackOverflowError) when viewing `.tfvars` and other files with long strings
+- - **Better theme and UX/UI** — warm dark mode with glow-line graph, concrete light mode with gradient background and floating parchment cards
 
 ## Install
 
