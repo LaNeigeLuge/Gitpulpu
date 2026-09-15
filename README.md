@@ -1,17 +1,48 @@
+<div align="center">
+
+<img src="res/img/logo.png" width="128" alt="Gitpulpu">
+
 # Gitpulpu
 
-A multiplatform Git client built with Jetpack Compose Desktop and JGit.
-Fork of [Gitnuro](https://github.com/JetpackDuba/Gitnuro) with a redesigned UI, smarter error handling, and quality-of-life improvements.
+**A desktop Git client for Linux, Windows and macOS.**
+
+Built with Compose Desktop and JGit. No account, no telemetry, no paid tier.
+
+</div>
 
 ![Gitpulpu demo](res/img/gitpulpu_demo.gif)
 
-## What's different from Gitnuro
+## What it does
 
-- **Auto-stash checkout** — switching branches with uncommitted changes automatically stashes, checks out, and pops. No more conflict dialogs for simple branch switches
-- **Friendly error messages** — known errors (merge conflicts, auth failures, ref collisions) show actionable guidance instead of raw stack traces
-- **Interactive rebase redesign** — color-coded actions, visible commit hashes, drag handles, and strikethrough on dropped commits
-- **Syntax highlighting fix** — resolved a crash (StackOverflowError) when viewing `.tfvars` and other files with long strings
-- **Better theme and UX/UI** — warm dark mode with glow-line graph, concrete light mode with gradient background and floating parchment cards
+Gitpulpu handles day-to-day Git work in a window instead of a terminal. It reads and writes
+ordinary repositories — nothing is stored in a proprietary format, and you can go back to the
+command line at any point.
+
+- **Read history** — commit graph, blame, file history, and search by message, author or commit ID
+- **Read changes** — syntax-highlighted diffs, side-by-side view, and image comparison
+- **Stage precisely** — whole files, single hunks, or individual lines, with the same granularity for discarding
+- **Commit** — commit, amend, revert, cherry-pick, reset
+- **Branch** — create, rename, delete, checkout, merge, and rebase
+- **Rewrite history** — interactive rebase with reorder, reword, squash, fixup, edit and drop
+- **Resolve conflicts** — in-app, file by file or side by side
+- **Sync** — clone, fetch, pull, push, force push, and upstream management
+- **Organise** — tags, stashes, remotes and submodules, all from the side panel
+- **Connect** — SSH keys and agent, HTTP credentials, and Git LFS
+
+It is a fork of [Gitnuro](https://github.com/JetpackDuba/Gitnuro), which is where all of the above
+comes from.
+
+## What Gitpulpu adds
+
+The fork is about interface and interaction — the same Git operations, with fewer dead ends.
+
+- **Fewer blocked states** — switching branches with uncommitted changes stashes, checks out and pops for you, instead of refusing with a conflict dialog
+- **Errors you can act on** — known failures (merge conflicts, auth problems, ref collisions, rejected pushes) explain what happened and offer the next step, rather than printing a stack trace
+- **A way out of every state** — a banner across the top while a rebase, merge, cherry-pick or revert is in progress, with abort, skip and continue always reachable
+- **Interactive rebase you can read** — colour-coded actions, visible commit hashes, drag handles, and dropped commits struck through
+- **Large repositories open fast** — history loads incrementally instead of blocking on the full log
+- **Repositories found for you** — point it at a directory and the welcome screen lists the repositories inside
+- **Reworked visual design** — a warm dark theme with a glow-line graph, and a light theme with layered cards, both tuned for long sessions
 
 ## Install
 
@@ -68,28 +99,6 @@ Installer: `.\gradlew.bat packageMsi` (output in `app\build\compose\binaries\mai
 | `./gradlew packageDeb` | Linux `.deb` package |
 | `./gradlew packageRpm` | Linux `.rpm` package |
 | `./gradlew packageDistributionForCurrentOS` | Auto-detect your OS and package |
-
-## Features
-
-Everything from Gitnuro, plus the improvements above:
-
-- View diffs for text-based files with syntax highlighting
-- Full commit history with branch graph
-- Stage, unstage, and discard changes (files, hunks, or individual lines)
-- Commit, amend, revert, cherry-pick, reset
-- Branch management (create, delete, rename, checkout)
-- Merge and rebase (including interactive rebase)
-- Pull, push, force push, fetch
-- Stash and pop stash
-- Tag management
-- Remote management
-- Clone repositories
-- Submodule support
-- File blame and file history
-- Side-by-side diff view
-- Image diff (side-by-side comparison)
-- Search by commit message, author, or commit ID
-- Custom JSON themes
 
 ## Authentication (GitHub & GitLab)
 
