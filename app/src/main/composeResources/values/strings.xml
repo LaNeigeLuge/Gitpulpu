@@ -38,7 +38,7 @@
     <string name="menu_stash">Stash</string>
     <string name="menu_stash_tooltip">Stash uncommitted changes</string>
     <string name="menu_pop_stash">Pop stash</string>
-    <string name="menu_pop_stash_tooltip">Pop the last stash</string>
+    <string name="menu_pop_stash_tooltip">Pop the selected stash, or the most recent one if none is selected</string>
     <string name="menu_terminal">Terminal</string>
     <string name="menu_terminal_tooltip">Open a terminal in the repository's path</string>
     <string name="menu_actions">Actions</string>

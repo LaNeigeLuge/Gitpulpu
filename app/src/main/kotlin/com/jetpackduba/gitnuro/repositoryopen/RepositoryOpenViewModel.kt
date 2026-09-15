@@ -248,6 +248,8 @@ class RepositoryOpenViewModel @Inject constructor(
         it.groupBy { tag -> tag.commitHash }
     }
 
+    private val stashesList = repositoryDataRepository.stashes.stateIn(emptyList())
+
     private val stashesHashes = repositoryDataRepository.stashes
         .map {
             it
@@ -502,6 +504,13 @@ class RepositoryOpenViewModel @Inject constructor(
 
     fun applyStash(stash: Commit) = applyStashUseCase(stash)
     fun popStash(stash: Commit) = popStashUseCase(stash)
+
+    /** Toolbar button and keybinding: pop the stash selected in the UI, or the most recent one if none is. */
+    override fun popStash() = popStashUseCase(selectedStash())
+
+    private fun selectedStash(): Commit? = (selectedItem.value as? SelectedItem.CommitItem)
+        ?.takeIf { it.isStash }
+        ?.commit
     fun deleteStash(stash: Commit) = deleteStashUseCase(stash)
 
     fun pushToRemoteBranch(branch: Branch) = pushBranchUseCase(
@@ -756,7 +765,7 @@ class RepositoryOpenViewModel @Inject constructor(
     }
 
     fun selectCommit(commit: Commit) = viewModelScope.launch {
-        selectedItem.value = SelectedItem.CommitItem(commit, isStash = false)
+        selectedItem.value = SelectedItem.CommitItem(commit, isStash = stashesList.value.any { it.hash == commit.hash })
 
         val searchValue = logSearchFilterResults.value
         if (searchValue is LogSearch.SearchResults) {

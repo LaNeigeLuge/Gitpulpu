@@ -7,5 +7,6 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.revwalk.RevCommit
 
 interface IPopStashGitAction {
-    suspend operator fun invoke(repositoryPath: String, stash: Commit): Either<Unit, GitError>
+    /** @return true if the stash was applied but left conflicts to resolve (the stash is kept in that case). */
+    suspend operator fun invoke(repositoryPath: String, stash: Commit): Either<Boolean, GitError>
 }

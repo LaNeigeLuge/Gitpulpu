@@ -5,5 +5,6 @@ import com.jetpackduba.gitnuro.domain.errors.GitError
 import com.jetpackduba.gitnuro.domain.models.Commit
 
 interface IApplyStashGitAction {
-    suspend operator fun invoke(repositoryPath: String, stashInfo: Commit): Either<Unit, GitError>
+    /** @return true if the stash was applied but left conflicts to resolve. */
+    suspend operator fun invoke(repositoryPath: String, stashInfo: Commit): Either<Boolean, GitError>
 }

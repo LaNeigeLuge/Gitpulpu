@@ -27,10 +27,17 @@ class PopStashUseCase @Inject constructor(
             refreshStashListUseCase()
         }
     ) { repositoryPath ->
-        val stashCommit = commit ?: getStashListGitAction(repositoryPath).bind().firstOrNull()
+        val stashes = getStashListGitAction(repositoryPath).bind()
+        val stashCommit = commit ?: stashes.firstOrNull()
 
         if (stashCommit == null) {
             raiseError(GenericError("No stashes found")) // TODO Refactor this to a proper type
+        }
+
+        // The selection may point at a stash that has already been popped or dropped; applying it again
+        // would silently re-apply a dangling commit.
+        if (stashes.none { it.hash == stashCommit.hash }) {
+            raiseError(GenericError("This stash no longer exists"))
         }
 
         popStashGitAction(repositoryPath, stashCommit)
