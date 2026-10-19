@@ -618,8 +618,6 @@ class StatusViewModelExtender @AssistedInject constructor(
         updateCommitMessage("")
         commitMessageChangesFlow.emit("")
         isAmend.value = false
-
-        positiveNotification(if (isAmend.value) "Commit amended" else "New commit created")
     }
 
     private suspend fun getIdentity(): Identity? {
@@ -631,11 +629,8 @@ class StatusViewModelExtender @AssistedInject constructor(
         ) {
             committerDataRequestState.value = CommitterDataRequestState.WaitingInput(author)
 
-            var committerData = committerDataRequestState.value
-
-            while (committerData is CommitterDataRequestState.WaitingInput) {
-                committerData = committerDataRequestState.value
-            }
+            // Suspend instead of polling: keeps a core free and lets tab closing cancel the wait
+            val committerData = committerDataRequestState.first { it !is CommitterDataRequestState.WaitingInput }
 
             if (committerData is CommitterDataRequestState.Accepted) {
                 val authorInfo = committerData.authorInfo

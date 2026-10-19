@@ -17,6 +17,7 @@ fun warningNotification(text: String) = NotificationData(NotificationType.Warnin
 
 fun TaskType.successTitle(): String? {
     return when (this) {
+        TaskType.DoCommit -> "Commit created"
         TaskType.StageLine -> "File line staged"
         TaskType.UnstageLine -> "File line unstaged"
         TaskType.DiscardFile -> "File discarded"

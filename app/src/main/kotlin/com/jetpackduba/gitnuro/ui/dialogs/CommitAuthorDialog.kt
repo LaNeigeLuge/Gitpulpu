@@ -31,13 +31,15 @@ fun CommitAuthorDialog(
 ) {
     var globalName by remember(authorInfo) { mutableStateOf(authorInfo.globalIdentity.name) }
     var globalEmail by remember(authorInfo) { mutableStateOf(authorInfo.globalIdentity.email) }
-    var persist by remember { mutableStateOf(false) }
+    // Usually a fresh machine with no ~/.gitconfig: saving avoids asking again on every commit
+    var persist by remember { mutableStateOf(true) }
+    val isIdentityValid = !globalName.isNullOrBlank() && !globalEmail.isNullOrBlank()
 
     IconBasedDialog(
         icon = painterResource(Res.drawable.person),
-        title = "Author identity",
-        subtitle = "Your Git configuration does not have a user identity set.",
-        isPrimaryActionEnabled = true,
+        title = "Who is committing?",
+        subtitle = "Git needs a name and email to sign commits, and none is set on this machine (user.name / user.email).",
+        isPrimaryActionEnabled = isIdentityValid,
         primaryActionText = stringResource(Res.string.generic_button_continue),
         beforeActionsFocusRequester = null,
         actionsFocusRequester = null,
@@ -46,8 +48,9 @@ fun CommitAuthorDialog(
         onPrimaryActionClicked = {
             onAccept(
                 AuthorInfo(
-                    globalIdentity = Identity(globalName, globalEmail),
-                    repositoryIdentity = Identity(name = "", email = ""),
+                    globalIdentity = Identity(globalName?.trim(), globalEmail?.trim()),
+                    // Keep any partial repo-level identity: saving "" would unset it
+                    repositoryIdentity = authorInfo.repositoryIdentity,
                 ),
                 persist,
             )
@@ -95,7 +98,7 @@ fun CommitAuthorDialog(
             )
 
             Text(
-                "Save identity in the .gitconfig file",
+                "Save as my global identity (~/.gitconfig) so I'm not asked again",
                 style = MaterialTheme.typography.body2,
                 color = MaterialTheme.colors.onBackground,
             )
